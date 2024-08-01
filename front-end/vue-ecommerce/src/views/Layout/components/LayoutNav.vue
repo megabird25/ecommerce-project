@@ -7,7 +7,7 @@
     <div class="container">
       <ul>
         <template v-if="true">
-          <li><a href="javascript:;"><i class="iconfont icon-user"></i>洪偉瀚</a></li>
+          <li><a href="javascript:;"><i class="fa-regular fa-user"></i> 洪偉瀚</a></li>
           <li>
             <el-popconfirm title="確認退出嗎?" confirm-button-text="確認" cancel-button-text="取消">
               <template #reference>

@@ -1,32 +1,29 @@
 <script setup>
+import { useCategoryStore } from "@/stores/category.js";
 
+const categoryStore = useCategoryStore();
 </script>
 
 <template>
-  <header class='app-header'>
+  <header class="app-header">
     <div class="container">
       <h1 class="logo">
         <RouterLink to="/">我的電商</RouterLink>
       </h1>
       <ul class="app-header-nav">
-        <li class="home">
-          <RouterLink to="/">首頁</RouterLink>
+        <li v-for="item in categoryStore.categoryList" :key="item.id">
+          <RouterLink to="/">{{ item.name }}</RouterLink>
         </li>
-        <li> <RouterLink to="/">居家</RouterLink> </li>
-        <li> <RouterLink to="/">美食</RouterLink> </li>
-        <li> <RouterLink to="/">服飾</RouterLink> </li>
       </ul>
       <div class="search">
-        <i class="iconfont icon-search"></i>
-        <input type="text" placeholder="搜尋看看">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="text" placeholder="搜尋看看" />
       </div>
-      
     </div>
   </header>
 </template>
 
-
-<style scoped lang='scss'>
+<style scoped lang="scss">
 .app-header {
   background: #fff;
 
@@ -43,7 +40,8 @@
       height: 132px;
       width: 100%;
       text-indent: -9999px;
-      background: url('@/assets/images/logo.png') no-repeat center 18px / contain;
+      background: url("@/assets/images/logo.png") no-repeat center 18px /
+        contain;
     }
   }
 
@@ -53,24 +51,24 @@
     padding-left: 40px;
     position: relative;
     z-index: 998;
-  
+
     li {
       margin-right: 40px;
       width: 38px;
       text-align: center;
-  
+
       a {
         font-size: 16px;
         line-height: 32px;
         height: 32px;
         display: inline-block;
-  
+
         &:hover {
           color: $xtxColor;
           border-bottom: 1px solid $xtxColor;
         }
       }
-  
+
       .active {
         color: $xtxColor;
         border-bottom: 1px solid $xtxColor;
@@ -84,11 +82,6 @@
     position: relative;
     border-bottom: 1px solid #e7e7e7;
     line-height: 32px;
-
-    .icon-search {
-      font-size: 18px;
-      margin-left: 5px;
-    }
 
     input {
       width: 140px;
