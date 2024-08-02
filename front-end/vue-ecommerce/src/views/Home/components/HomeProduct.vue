@@ -2,7 +2,7 @@
 import { onMounted, ref } from "vue";
 import { getGoodsAPI } from "@/apis/home.js";
 import HomePanel from "./HomePanel.vue";
-import GoodsItem from "./GoodsItem.vue";
+import GoodsItem from "@/components/GoodsItem.vue";
 
 const goodsProduct = ref([]);
 const getGoods = async () => {
