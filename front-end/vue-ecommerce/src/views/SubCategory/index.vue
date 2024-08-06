@@ -2,7 +2,6 @@
 import { ref, onMounted } from "vue";
 import { useRoute } from "vue-router";
 import { getCategoryFilterAPI, getSubCategoryAPI } from "@/apis/category.js";
-import GoodsItem from "@/components/GoodsItem.vue";
 
 const categoryData = ref([]);
 const route = useRoute();

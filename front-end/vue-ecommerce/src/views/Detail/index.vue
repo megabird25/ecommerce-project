@@ -1,24 +1,33 @@
 <script setup>
 import { getDetail } from "@/apis/detail.js";
 import { onMounted, ref } from "vue";
-import { useRoute } from "vue-router";
+import { useRoute, onBeforeRouteUpdate } from "vue-router";
 import DetailHot from "./components/DetailHot.vue";
+import ImageView from "./components/ImageView.vue";
 
 const goods = ref({});
 const route = useRoute();
-const getGoods = async () => {
-  const res = await getDetail(route.params.id);
+const getGoods = async (id) => {
+  const res = await getDetail(id);
   goods.value = res.result;
 };
 
 onMounted(() => {
-  getGoods();
+  getGoods(route.params.id);
 });
+
+onBeforeRouteUpdate((to) => {
+  getGoods(to.params.id);
+});
+
+const changeSku = (sku) => {
+  console.log(sku);
+};
 </script>
 
 <template>
   <div class="xtx-goods-page">
-    <div class="container" v-if="goods.details">
+    <div class="container" v-if="goods.id === route.params.id">
       <div class="bread-container">
         <el-breadcrumb separator=">">
           <el-breadcrumb-item :to="{ path: '/' }">首頁</el-breadcrumb-item>
@@ -37,8 +46,7 @@ onMounted(() => {
         <div>
           <div class="goods-info">
             <div class="media">
-              <!-- 图片预览区 -->
-
+              <ImageView :image-list="goods.mainPictures" />
               <ul class="goods-sales">
                 <li>
                   <p>銷量人氣</p>
@@ -66,13 +74,13 @@ onMounted(() => {
               <p class="g-name">{{ goods.name }}</p>
               <p class="g-desc">{{ goods.desc }}</p>
               <p class="g-price">
-                <span>${{ goods.oldPrice }}</span>
                 <span>${{ goods.price }}</span>
+                <span>${{ goods.oldPrice }}</span>
               </p>
               <div class="g-service">
                 <dl>
                   <dt>促銷</dt>
-                  <dd>12月好物放送，App領券購買直降120元</dd>
+                  <dd>12月好物放送，App領券購買現省120元</dd>
                 </dl>
                 <dl>
                   <dt>服務</dt>
@@ -84,8 +92,8 @@ onMounted(() => {
                   </dd>
                 </dl>
               </div>
-              <!-- sku组件 -->
-
+              <!-- sku組件 -->
+              <XtxSku :goods="goods" @change="changeSku" />
               <!-- 数据组件 -->
 
               <div>

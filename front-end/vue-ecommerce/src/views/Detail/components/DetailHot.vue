@@ -19,13 +19,13 @@ const route = useRoute();
 const getHotList = async () => {
   const res = await fetchHotGoodsAPI({
     id: route.params.id,
-    type: 1,
+    type: props.hotType,
   });
   hotList.value = res.result;
 };
 
 onMounted(() => {
-  getHotList();
+  getHotList(route.params.id);
 });
 </script>
 
@@ -33,7 +33,7 @@ onMounted(() => {
   <div class="goods-hot">
     <h3>{{ title }}</h3>
     <RouterLink
-      to="/"
+      :to="`/detail/${item.id}`"
       class="goods-item"
       v-for="item in hotList"
       :key="item.id"
