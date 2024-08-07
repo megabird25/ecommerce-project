@@ -26,7 +26,7 @@ const changeSku = (sku) => {
 </script>
 
 <template>
-  <div class="xtx-goods-page">
+  <div class="goods-page">
     <div class="container" v-if="goods.id === route.params.id">
       <div class="bread-container">
         <el-breadcrumb separator=">">
@@ -140,7 +140,7 @@ const changeSku = (sku) => {
 </template>
 
 <style scoped lang="scss">
-.xtx-goods-page {
+.goods-page {
   .goods-info {
     min-height: 600px;
     background: #fff;
