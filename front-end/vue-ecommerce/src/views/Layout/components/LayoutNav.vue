@@ -1,17 +1,35 @@
 <script setup>
+import { useRouter } from "vue-router";
+import { useUserStore } from "@/stores/user.js";
 
+const userStore = useUserStore();
+const router = useRouter();
+const confirm = () => {
+  userStore.clearUserInfo();
+  router.push("/login");
+};
 </script>
 
 <template>
   <nav class="app-topnav">
     <div class="container">
       <ul>
-        <template v-if="false">
-          <li><a href="javascript:;"><i class="fa-regular fa-user"></i> 洪偉瀚</a></li>
+        <template v-if="userStore.userInfo.token">
+          <li>
+            <a href="javascript:;"
+              ><i class="fa-regular fa-user"></i>
+              {{ userStore.userInfo.account }}</a
+            >
+          </li>
           <li><a href="javascript:;">我的訂單</a></li>
           <li><a href="javascript:;">會員中心</a></li>
           <li>
-            <el-popconfirm title="確認退出嗎?" confirm-button-text="確認" cancel-button-text="取消">
+            <el-popconfirm
+              @confirm="confirm"
+              title="確認退出嗎?"
+              confirm-button-text="確認"
+              cancel-button-text="取消"
+            >
               <template #reference>
                 <a href="javascript:;">登出</a>
               </template>
@@ -19,7 +37,9 @@
           </li>
         </template>
         <template v-else>
-          <li><a href="javascript:;" @click="$router.push('/login')">登入</a></li>
+          <li>
+            <a href="javascript:;" @click="$router.push('/login')">登入</a>
+          </li>
           <li><a href="javascript:;">幫助中心</a></li>
           <li><a href="javascript:;">關於我們</a></li>
         </template>
@@ -27,7 +47,6 @@
     </div>
   </nav>
 </template>
-
 
 <style scoped lang="scss">
 .app-topnav {
@@ -54,7 +73,7 @@
         }
       }
 
-      ~li {
+      ~ li {
         a {
           border-left: 2px solid #666;
         }

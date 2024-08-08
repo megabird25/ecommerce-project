@@ -1,9 +1,9 @@
 <script setup>
 import { ref } from "vue";
-import { loginAPI } from "@/apis/user.js";
 import { ElMessage } from "element-plus";
 import "element-plus/theme-chalk/el-message.css";
 import { useRouter } from "vue-router";
+import { useUserStore } from "@/stores/user.js";
 
 const form = ref({
   account: "",
@@ -27,13 +27,13 @@ const rules = {
 };
 
 const formRef = ref(null);
+const userStore = useUserStore();
 const router = useRouter();
 const doLogin = () => {
   const { account, password } = form.value;
   formRef.value.validate(async (valid) => {
     if (valid) {
-      const res = await loginAPI({ account, password });
-      console.log(res);
+      await userStore.getUserInfo({ account, password });
       ElMessage({ type: "success", message: "登入成功" });
       router.replace({ path: "/" });
     }
@@ -57,7 +57,7 @@ const doLogin = () => {
     <section class="login-section">
       <div class="wrapper">
         <nav>
-          <a href="javascript:;">帳戶登入</a>
+          <i>帳戶登入</i>
         </nav>
         <div class="account-box">
           <div class="form">
@@ -176,7 +176,7 @@ const doLogin = () => {
       text-align: right;
       align-items: center;
 
-      a {
+      i {
         flex: 1;
         line-height: 1;
         display: inline-block;
