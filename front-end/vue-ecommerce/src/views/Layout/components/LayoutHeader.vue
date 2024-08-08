@@ -1,5 +1,6 @@
 <script setup>
 import { useCategoryStore } from "@/stores/category.js";
+import HeaderCart from './HeaderCart.vue';
 
 const categoryStore = useCategoryStore();
 </script>
@@ -19,6 +20,7 @@ const categoryStore = useCategoryStore();
         <i class="fa-solid fa-magnifying-glass"></i>
         <input type="text" placeholder="搜尋看看" />
       </div>
+      <HeaderCart />
     </div>
   </header>
 </template>
