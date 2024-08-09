@@ -5,7 +5,7 @@ import { ElMessage } from "element-plus";
 import { getDetail } from "@/apis/detail.js";
 import DetailHot from "./components/DetailHot.vue";
 import ImageView from "./components/ImageView.vue";
-import { useCartStore } from "@/stores/cart.js";
+import { useCartStore } from "@/stores/cartStore.js";
 
 const goods = ref({});
 const route = useRoute();

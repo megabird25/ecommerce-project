@@ -1,5 +1,5 @@
 <script setup>
-import { useCategoryStore } from "@/stores/category.js";
+import { useCategoryStore } from "@/stores/categoryStore.js";
 
 const categoryStore = useCategoryStore();
 </script>
@@ -8,7 +8,7 @@ const categoryStore = useCategoryStore();
   <div class="home-category">
     <ul class="menu">
       <li v-for="item in categoryStore.categoryList" :key="item.id">
-        <RouterLink to="/">{{ item.name }}</RouterLink>
+        <RouterLink :to="`/category/${item.id}`">{{ item.name }}</RouterLink>
         <RouterLink v-for="i in item.children.slice(0, 2)" :key="i.id" to="/">{{
           i.name
         }}</RouterLink>

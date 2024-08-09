@@ -1,5 +1,5 @@
 <script setup>
-import { useCartStore } from "@/stores/cart.js";
+import { useCartStore } from "@/stores/cartStore.js";
 const cartStore = useCartStore();
 </script>
 
@@ -12,7 +12,7 @@ const cartStore = useCartStore();
     <div class="layer">
       <div class="list">
         <div class="item" v-for="i in cartStore.cartList" :key="i">
-          <RouterLink to="">
+          <RouterLink :to="`/detail/${i.id}`">
             <img :src="i.picture" alt="" />
             <div class="center">
               <p class="name ellipsis-2">
@@ -25,7 +25,10 @@ const cartStore = useCartStore();
               <p class="count">x{{ i.count }}</p>
             </div>
           </RouterLink>
-          <i class="fa-solid fa-xmark fa-xl" @click="cartStore.delCart(i.skuId)"></i>
+          <i
+            class="fa-solid fa-xmark fa-xl"
+            @click="cartStore.delCart(i.skuId)"
+          ></i>
         </div>
       </div>
       <div class="foot">

@@ -34,18 +34,15 @@
     <div class="extra">
       <div class="container">
         <div class="slogan">
-          <a href="javascript:;">
-            <i class="iconfont icon-footer01"></i>
+          <p>
             <span>價格實惠</span>
-          </a>
-          <a href="javascript:;">
-            <i class="iconfont icon-footer02"></i>
+          </p>
+          <p>
             <span>物流快捷</span>
-          </a>
-          <a href="javascript:;">
-            <i class="iconfont icon-footer03"></i>
+          </p>
+          <p>
             <span>品質新鮮</span>
-          </a>
+          </p>
         </div>
         <!-- 版權資訊 -->
         <div class="copyright">
@@ -184,7 +181,7 @@
     display: flex;
     justify-content: space-between;
 
-    a {
+    p {
       height: 58px;
       line-height: 58px;
       color: #fff;
