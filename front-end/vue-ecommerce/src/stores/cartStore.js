@@ -81,6 +81,7 @@ export const useCartStore = defineStore(
       delCart,
       clearCart,
       allCheck,
+      updateList,
     };
   },
   { persist: true }
