@@ -1,5 +1,5 @@
 <script setup>
-import { useRouter } from "vue-router";
+import { RouterLink, useRouter } from "vue-router";
 import { useUserStore } from "@/stores/userStore.js";
 
 const userStore = useUserStore();
@@ -16,13 +16,13 @@ const confirm = () => {
       <ul>
         <template v-if="userStore.userInfo.token">
           <li>
-            <a href="javascript:;"
-              ><i class="fa-regular fa-user"></i>
-              {{ userStore.userInfo.account }}</a
-            >
+            <p>
+              <i class="fa-regular fa-user"></i>
+              {{ userStore.userInfo.account }}
+            </p>
           </li>
-          <li><a href="javascript:;">我的訂單</a></li>
-          <li><a href="javascript:;">會員中心</a></li>
+          <li><RouterLink to="/member/user">會員中心</RouterLink></li>
+          <li><RouterLink to="/member/order">我的訂單</RouterLink></li>
           <li>
             <el-popconfirm
               @confirm="confirm"
@@ -57,7 +57,7 @@ const confirm = () => {
     justify-content: flex-end;
     align-items: center;
     li {
-      a {
+      p, a {
         padding: 0 15px;
         color: #cdcdcd;
         line-height: 1;

@@ -19,12 +19,12 @@ export const getCategoryFilterAPI = (id) => {
 };
 
 /**
- * @data { 
-     categoryId: 1005000 ,
-     page: 1,
-     pageSize: 20,
-     sortField: 'publishTime' | 'orderNum' | 'evaluateNum'
-   } 
+@data { 
+  categoryId: 1005000 ,
+  page: 1,
+  pageSize: 20,
+  sortField: 'publishTime' | 'orderNum' | 'evaluateNum'
+} 
  */
 export const getSubCategoryAPI = (data) => {
   return httpInstance({
