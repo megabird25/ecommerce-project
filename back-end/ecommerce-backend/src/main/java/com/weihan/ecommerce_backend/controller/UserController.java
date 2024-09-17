@@ -1,33 +1,52 @@
 package com.weihan.ecommerce_backend.controller;
 
+import com.weihan.ecommerce_backend.model.dto.Account;
 import com.weihan.ecommerce_backend.model.dto.Result;
 import com.weihan.ecommerce_backend.model.entity.User;
+import com.weihan.ecommerce_backend.service.S3Service;
 import com.weihan.ecommerce_backend.service.UserService;
+import com.weihan.ecommerce_backend.utils.JwtUtil;
+import com.weihan.ecommerce_backend.utils.ThreadLocalUtil;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import org.mindrot.jbcrypt.BCrypt;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.io.File;
+import java.util.concurrent.TimeUnit;
 
 @RestController
 @RequestMapping("/user")
 public class UserController {
 
     private final UserService userService;
+    private final StringRedisTemplate stringRedisTemplate;
+    private final S3Service s3Service;
 
-    public UserController(UserService userService) {
+    public UserController(UserService userService, StringRedisTemplate stringRedisTemplate, S3Service s3Service) {
         this.userService = userService;
+        this.stringRedisTemplate = stringRedisTemplate;
+        this.s3Service = s3Service;
     }
 
-    @PostMapping
-    public Result<User> register(@RequestBody User user) {
-        Optional<User> userOpt = userService.findByAccount(user.getAccount());
+    @PostMapping("/register")
+    public Result<User> register(@RequestBody Account account) {
+        Optional<User> userOpt = userService.findByUsername(account.getUsername());
 
         if (userOpt.isEmpty()) {
-            String hashedPassword = BCrypt.hashpw(user.getPassword(), BCrypt.gensalt());
-            user.setPassword(hashedPassword);
-            User newUser = userService.save(user);
+            User newUser = new User();
+            String hashedPassword = BCrypt.hashpw(account.getPassword(), BCrypt.gensalt());
+            newUser.setUsername(account.getUsername());
+            newUser.setPassword(hashedPassword);
+            userService.save(newUser);
+
             return Result.success("註冊成功", newUser);
         }
 
@@ -35,44 +54,48 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public Result<Map<String, String>> login(@RequestBody Map<String, String> userData) {
-        String username = userData.get("account");
-        String password = userData.get("password");
-
-        Optional<User> userOpt = userService.findByAccount(username);
+    public Result<User> login(@RequestBody Account account, HttpServletResponse response) {
+        Optional<User> userOpt = userService.findByUsername(account.getUsername());
 
         if (userOpt.isPresent()) {
             User user = userOpt.get();
 
-            if (BCrypt.checkpw(password, user.getPassword())) {
-                String token = "token";
-                Map<String, String> map = new HashMap<>();
-                map.put("id", user.getId().toString());
-                map.put("account", user.getAccount());
-                map.put("email", user.getEmail());
-                map.put("mobile", user.getMobile());
-                map.put("avatar", user.getAvatar());
-                map.put("nickname", user.getNickname());
-                map.put("gender", user.getGender());
-                map.put("birthday", user.getBirthday().toString());
-                map.put("token", token);
-                return Result.success("登入成功", map);
+            if (BCrypt.checkpw(account.getPassword(), user.getPassword())) {
+                // 生成 token
+                Map<String, Object> claims = new HashMap<>();
+                claims.put("id", user.getId());
+                claims.put("username", user.getUsername());
+                String token = JwtUtil.genToken(claims);
+
+                // 把 token 儲存到 redis 中
+                ValueOperations<String, String> operations = stringRedisTemplate.opsForValue();
+                operations.set(user.getId().toString(), token, 24, TimeUnit.HOURS);
+
+                // 生成並配置 cookie
+                Cookie cookie = new Cookie("jwt_token", token);
+                cookie.setPath("/");
+                cookie.setHttpOnly(true);
+                cookie.setMaxAge(24 * 60 * 60);
+                response.addCookie(cookie);
+
+                return Result.success("登入成功", user);
             }
         }
 
-        return Result.error("你的帳號或密碼不正確");
+        return Result.error("帳號或密碼不正確");
     }
 
-    @PutMapping("/{id}")
-    public Result<User> updateUserInfo(@PathVariable Integer id, @RequestBody User userDetails) {
+    @PutMapping("/update")
+    public Result<User> updateUserInfo(@RequestBody User userDetails) {
+        Map<String, Object> claims = ThreadLocalUtil.get();
+        Integer id = (Integer) claims.get("id");
         Optional<User> userOpt = userService.findById(id);
 
 
-        if (userOpt.isPresent()){
+        if (userOpt.isPresent()) {
             User user = userOpt.get();
             user.setEmail(userDetails.getEmail());
             user.setMobile(userDetails.getMobile());
-            user.setAvatar(userDetails.getAvatar());
             user.setNickname(userDetails.getNickname());
             user.setGender(userDetails.getGender());
             user.setBirthday(userDetails.getBirthday());
@@ -80,11 +103,13 @@ public class UserController {
             return Result.success("修改成功", updatedUser);
         }
 
-        return Result.error("操作有誤");
+        return Result.error("找不到該用戶");
     }
 
-    @PatchMapping("/password/{id}")
-    public Result<String> updateUserPassword(@PathVariable Integer id, @RequestBody Map<String, String> userData) {
+    @PatchMapping("/password")
+    public Result<String> updateUserPassword(@RequestBody Map<String, String> userData) {
+        Map<String, Object> claims = ThreadLocalUtil.get();
+        Integer id = (Integer) claims.get("id");
         Optional<User> userOpt = userService.findById(id);
 
         if (userOpt.isPresent()) {
@@ -100,6 +125,44 @@ public class UserController {
             }
 
             return Result.error("原密碼不正確");
+        }
+
+        return Result.error("找不到該用戶");
+    }
+
+    @PatchMapping("/avatar")
+    public Result<String> updateUserAvatar(@RequestParam("file") MultipartFile file) throws IOException {
+        if (file.isEmpty()) {
+            Result.error("找不到檔案");
+        }
+
+        Map<String, Object> claims = ThreadLocalUtil.get();
+        String username = (String) claims.get("username");
+        Optional<User> userOpt = userService.findByUsername(username);
+
+        if (userOpt.isPresent()) {
+            // 將 MultipartFile 轉換為 File
+            File tempFile = File.createTempFile("temp", file.getOriginalFilename());
+            file.transferTo(tempFile);
+
+            // 指定檔案名稱為帳號
+            int idx = file.getOriginalFilename().lastIndexOf(".");
+            if (idx == -1) {
+                return Result.error("不正確的檔案類型");
+            }
+            String fileName = username + file.getOriginalFilename().substring(idx);
+
+            // 上傳文件到 S3
+            String fileUrl = s3Service.uploadUserAvatar(tempFile, fileName);
+
+            // 刪除本地臨時文件
+            tempFile.delete();
+
+            User user = userOpt.get();
+            user.setAvatar(fileUrl);
+            userService.save(user);
+
+            return Result.success("修改成功", fileUrl);
         }
 
         return Result.error("找不到該用戶");

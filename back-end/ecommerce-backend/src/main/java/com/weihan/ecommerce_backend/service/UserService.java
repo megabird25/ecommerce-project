@@ -6,11 +6,10 @@ import java.util.Optional;
 
 public interface UserService {
 
-    Optional<User> findByAccount(String account);
+    Optional<User> findByUsername(String username);
 
     User save(User user);
 
     Optional<User> findById(Integer id);
 
-    Optional<User> updateInfo(Integer id, User userDetails);
 }
