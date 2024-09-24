@@ -3,17 +3,6 @@ DROP DATABASE IF EXISTS `ecommerce`;
 CREATE DATABASE `ecommerce`;
 USE `ecommerce`;
 
-DROP TABLE IF EXISTS `users`;
-DROP TABLE IF EXISTS `user_address`;
-DROP TABLE IF EXISTS `categories`;
-DROP TABLE IF EXISTS `products`;
-DROP TABLE IF EXISTS `product_details`;
-DROP TABLE IF EXISTS `brand`;
-DROP TABLE IF EXISTS `reviews_and_ratings`;
-DROP TABLE IF EXISTS `orders`;
-DROP TABLE IF EXISTS `order_details`;
-DROP TABLE IF EXISTS `payments`;
-
 
 CREATE TABLE `users` (
   `id` INT PRIMARY KEY AUTO_INCREMENT,
@@ -33,7 +22,7 @@ CREATE TABLE `user_address` (
   `receiver` VARCHAR(20) NOT NULL,
   `contact` VARCHAR(20) NOT NULL,
   `address` VARCHAR(255) NOT NULL,
-  `isDefault` TINYINT NOT NULL,
+  `is_default` TINYINT NOT NULL,
   `user_id` INT
 );
 
@@ -56,10 +45,9 @@ CREATE TABLE `products` (
   `brand_id` INT
 );
 
-CREATE TABLE `product_details` (
+CREATE TABLE `product_detail_images` (
   `id` INT PRIMARY KEY AUTO_INCREMENT,
-  `name` VARCHAR(100) NOT NULL,
-  `value` VARCHAR(100) NOT NULL,
+  `image_url` VARCHAR(255) NOT NULL,
   `product_id` INT
 );
 
@@ -113,7 +101,7 @@ ALTER TABLE `categories` ADD FOREIGN KEY (`parent_category_id`) REFERENCES `cate
 
 ALTER TABLE `products` ADD FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`);
 
-ALTER TABLE `product_details` ADD FOREIGN KEY (`product_id`) REFERENCES `products` (`id`);
+ALTER TABLE `product_detail_images` ADD FOREIGN KEY (`product_id`) REFERENCES `products` (`id`);
 
 ALTER TABLE `products` ADD FOREIGN KEY (`brand_id`) REFERENCES `brand` (`id`);
 

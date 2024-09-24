@@ -1,5 +1,6 @@
 package com.weihan.ecommerce_backend.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -23,11 +24,12 @@ public class UserAddress {
     @Column(name = "address", nullable = false)
     private String address;
 
-    @Column(name = "isDefault", nullable = false)
+    @Column(name = "is_default", nullable = false)
     private Byte isDefault;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH})
     @JoinColumn(name = "user_id")
+    @JsonIgnore
     private User user;
 
 }

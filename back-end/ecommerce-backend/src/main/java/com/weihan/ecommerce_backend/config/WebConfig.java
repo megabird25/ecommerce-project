@@ -12,7 +12,12 @@ public class WebConfig implements WebMvcConfigurer {
 
     private final JwtTokenInterceptor jwtTokenInterceptor;
 
-    private static final List<String> BYPASS_PATHS = List.of("/user/update", "/user/password", "/user/avatar");
+    private static final List<String> BYPASS_PATHS = List.of(
+            "/user/update",
+            "/user/password",
+            "/user/avatar",
+            "/user/address/**",
+            "/user/order");
 
     public WebConfig(JwtTokenInterceptor jwtTokenInterceptor) {
         this.jwtTokenInterceptor = jwtTokenInterceptor;

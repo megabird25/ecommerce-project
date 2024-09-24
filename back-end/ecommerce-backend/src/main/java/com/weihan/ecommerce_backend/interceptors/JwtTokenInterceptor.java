@@ -37,7 +37,7 @@ public class JwtTokenInterceptor implements HandlerInterceptor {
             }
 
         } catch (Exception e) {
-            // token 解析異常，回應 401
+            // token 解析異常響應 401
             response.setStatus(401);
 
             return false;
@@ -47,9 +47,9 @@ public class JwtTokenInterceptor implements HandlerInterceptor {
         String id = claims.get("id").toString();
         ValueOperations<String, String> operations = stringRedisTemplate.opsForValue();
         String redisToken = operations.get(id);
-        // 獲取不到 redisToken 驗證失敗，回應 401
+        // 獲取不到 redisToken 驗證失敗響應 403
         if (redisToken == null) {
-            response.setStatus(401);
+            response.setStatus(403);
 
             return false;
         }

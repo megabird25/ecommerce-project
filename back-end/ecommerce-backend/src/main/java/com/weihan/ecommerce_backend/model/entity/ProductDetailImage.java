@@ -7,18 +7,15 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-@Table(name = "product_details")
-public class ProductDetail {
+@Table(name = "product_detail_images")
+public class ProductDetailImage {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Integer id;
 
-    @Column(name = "name", nullable = false, length = 100)
-    private String name;
-
-    @Column(name = "value", nullable = false, length = 100)
-    private String value;
+    @Column(name = "image_url", nullable = false)
+    private String imageUrl;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id")

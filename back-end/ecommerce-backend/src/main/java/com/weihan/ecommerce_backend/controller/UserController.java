@@ -86,19 +86,18 @@ public class UserController {
     }
 
     @PutMapping("/update")
-    public Result<User> updateUserInfo(@RequestBody User userDetails) {
+    public Result<User> updateUserInfo(@RequestBody User userUpdatedData) {
         Map<String, Object> claims = ThreadLocalUtil.get();
         Integer id = (Integer) claims.get("id");
         Optional<User> userOpt = userService.findById(id);
 
-
         if (userOpt.isPresent()) {
             User user = userOpt.get();
-            user.setEmail(userDetails.getEmail());
-            user.setMobile(userDetails.getMobile());
-            user.setNickname(userDetails.getNickname());
-            user.setGender(userDetails.getGender());
-            user.setBirthday(userDetails.getBirthday());
+            user.setEmail(userUpdatedData.getEmail());
+            user.setMobile(userUpdatedData.getMobile());
+            user.setNickname(userUpdatedData.getNickname());
+            user.setGender(userUpdatedData.getGender());
+            user.setBirthday(userUpdatedData.getBirthday());
             User updatedUser = userService.save(user);
             return Result.success("修改成功", updatedUser);
         }
@@ -121,6 +120,7 @@ public class UserController {
                 String hashedPassword = BCrypt.hashpw(newPassword, BCrypt.gensalt());
                 user.setPassword(hashedPassword);
                 userService.save(user);
+
                 return Result.success("修改成功");
             }
 
@@ -145,7 +145,7 @@ public class UserController {
             File tempFile = File.createTempFile("temp", file.getOriginalFilename());
             file.transferTo(tempFile);
 
-            // 指定檔案名稱為帳號
+            // 指定檔案名稱為 用戶名 + 副檔名
             int idx = file.getOriginalFilename().lastIndexOf(".");
             if (idx == -1) {
                 return Result.error("不正確的檔案類型");
