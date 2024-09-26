@@ -1,8 +1,13 @@
 <script setup>
+import { ref } from "vue";
 import { useCategoryStore } from "@/stores/categoryStore.js";
-import HeaderCart from './HeaderCart.vue';
+import HeaderCart from "./HeaderCart.vue";
+import { RouterLink } from "vue-router";
 
 const categoryStore = useCategoryStore();
+
+const keyword = ref("");
+
 </script>
 
 <template>
@@ -13,12 +18,16 @@ const categoryStore = useCategoryStore();
       </h1>
       <ul class="app-header-nav">
         <li v-for="item in categoryStore.categoryList" :key="item.id">
-          <RouterLink active-class="active" :to="`/category/${item.id}`">{{ item.name }}</RouterLink>
+          <RouterLink active-class="active" :to="`/category/${item.id}`">
+            {{ item.name }}
+          </RouterLink>
         </li>
       </ul>
       <div class="search">
-        <i class="fa-solid fa-magnifying-glass"></i>
-        <input type="text" placeholder="搜尋看看" />
+        <input type="text" placeholder="搜尋看看" v-model="keyword"/>
+        <RouterLink :to="`/search?keyword=${keyword}`">
+          <i class="fa-solid fa-magnifying-glass"></i>
+        </RouterLink>
       </div>
       <HeaderCart />
     </div>

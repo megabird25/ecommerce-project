@@ -1,24 +1,31 @@
 <script setup>
 import { ref, onMounted } from "vue";
-import { useRoute } from "vue-router";
-import { getSubCategoryProductsAPI } from "@/apis/category.js";
+import { useRoute, onBeforeRouteUpdate } from "vue-router";
+import { searchProductsAPI } from "@/apis/product.js";
 
 const route = useRoute();
 
 const goodList = ref([]);
 const title = ref("");
 const reqData = ref({
+  keyword: route.query.keyword,
   page: 1,
   pageSize: 20,
   sortField: "publishTime",
 });
 const getProducts = async () => {
-  const res = await getSubCategoryProductsAPI(route.params.id, reqData.value);
+  const res = await searchProductsAPI(reqData.value);
   title.value = res.result.title;
   goodList.value = res.result.data;
 };
 
 onMounted(() => {
+  getProducts();
+});
+
+onBeforeRouteUpdate((to) => {
+  reqData.value.keyword = to.query.keyword;
+  reqData.value.page = 1;
   getProducts();
 });
 
@@ -30,7 +37,7 @@ const tabChange = () => {
 const disabled = ref(false);
 const load = async () => {
   reqData.value.page++;
-  const res = await getSubCategoryProductsAPI(route.params.id, reqData.value);
+  const res = await searchProductsAPI(reqData.value);
   goodList.value = [...goodList.value, ...res.result.data];
 
   if (reqData.value.page === res.result.total_pages) {

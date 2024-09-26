@@ -9,7 +9,7 @@ public class Result<T> {
 
     private Integer code;
     private String message;
-    private T data;
+    private T result;
 
     public static <T> Result<T> success(String message) {
         return new Result<>(0, message, null);

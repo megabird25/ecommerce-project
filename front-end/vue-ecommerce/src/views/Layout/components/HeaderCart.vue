@@ -7,18 +7,17 @@ const cartStore = useCartStore();
   <div class="cart">
     <a class="curr" href="javascript:;">
       <i class="fa-solid fa-cart-shopping fa-xl"></i
-      ><em>{{ cartStore.cartList.length }}</em>
+      ><em>{{ cartStore.cartList?.length }}</em>
     </a>
     <div class="layer">
       <div class="list">
         <div class="item" v-for="i in cartStore.cartList" :key="i">
           <RouterLink :to="`/detail/${i.id}`">
-            <img :src="i.picture" alt="" />
+            <img :src="i.image_url" alt="" />
             <div class="center">
               <p class="name ellipsis-2">
                 {{ i.name }}
               </p>
-              <p class="attr ellipsis">{{ i.attrsText }}</p>
             </div>
             <div class="right">
               <p class="price">${{ i.price }}</p>
@@ -27,7 +26,7 @@ const cartStore = useCartStore();
           </RouterLink>
           <i
             class="fa-solid fa-xmark fa-xl"
-            @click="cartStore.delCart(i.skuId)"
+            @click="cartStore.delCart(i.id)"
           ></i>
         </div>
       </div>
@@ -198,11 +197,6 @@ const cartStore = useCartStore();
 
           .name {
             font-size: 16px;
-          }
-
-          .attr {
-            color: #999;
-            padding-top: 5px;
           }
         }
 

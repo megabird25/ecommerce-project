@@ -17,8 +17,8 @@ onMounted(() => {
 <template>
   <div class="home-banner">
     <el-carousel height="500px">
-      <el-carousel-item v-for="item in bannerList" :key="item.id">
-        <img :src="item.imgUrl" alt="" />
+      <el-carousel-item v-for="(item, index) in bannerList" :key="index">
+        <img :src="item" alt="" />
       </el-carousel-item>
     </el-carousel>
   </div>

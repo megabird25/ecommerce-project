@@ -1,15 +1,25 @@
 <script setup>
-import { useCategoryStore } from "@/stores/categoryStore.js";
+import { ref, onMounted } from "vue";
+import { getHeadAPI } from '@/apis/home.js';
 
-const categoryStore = useCategoryStore();
+const headList = ref([]);
+
+const getHeadList = async () => {
+  const res = await getHeadAPI()
+  headList.value = res.result;
+}
+
+onMounted(() => {
+  getHeadList()
+})
 </script>
 
 <template>
   <div class="home-category">
     <ul class="menu">
-      <li v-for="item in categoryStore.categoryList" :key="item.id">
-        <RouterLink :to="`/category/${item.id}`">{{ item.name }}</RouterLink>
-        <RouterLink v-for="i in item.children.slice(0, 2)" :key="i.id" to="/">{{
+      <li v-for="item in headList" :key="item.category.id">
+        <RouterLink :to="`/category/${item.category.id}`">{{ item.category.name }}</RouterLink>
+        <RouterLink v-for="i in item.category.sub_categories.slice(0, 2)" :key="i.id" to="/">{{
           i.name
         }}</RouterLink>
         <!-- 彈層layer位置 -->
@@ -18,12 +28,12 @@ const categoryStore = useCategoryStore();
           <ul>
             <li v-for="i in item.goods" :key="i.id">
               <RouterLink :to="`/detail/${i.id}`">
-                <img :src="i.picture" alt="" />
+                <img :src="i.image_url" alt="" />
                 <div class="info">
                   <p class="name ellipsis-2">
                     {{ i.name }}
                   </p>
-                  <p class="desc ellipsis">{{ i.desc }}</p>
+                  <p class="desc ellipsis">{{ i.description }}</p>
                   <p class="price">${{ i.price }}</p>
                 </div>
               </RouterLink>
@@ -92,6 +102,7 @@ const categoryStore = useCategoryStore();
             height: 120px;
             margin-right: 15px;
             margin-bottom: 15px;
+            padding-left: 0px;
             border: 1px solid #eee;
             border-radius: 4px;
             background: #fff;
@@ -131,6 +142,7 @@ const categoryStore = useCategoryStore();
                 }
 
                 .price {
+                  margin-top: 5px;
                   font-size: 22px;
                   color: $priceColor;
 

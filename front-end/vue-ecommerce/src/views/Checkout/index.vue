@@ -1,24 +1,26 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
-import { getCheckInfoAPI, createOrderAPI } from "@/apis/checkout.js";
 import { useCartStore } from "@/stores/cartStore.js";
+import { getUserAddressAPI } from "@/apis/address.js";
+import { ElMessage } from "element-plus";
+import { createOrderAPI } from "@/apis/order";
 
 const showDialog = ref(false);
+const payWay = ref(null);
 
-const checkInfo = ref({});
+const userAddress = ref({});
 const curAddress = ref({});
-const getCheckInfo = async () => {
-  const res = await getCheckInfoAPI();
-  checkInfo.value = res.result;
+const cartStore = useCartStore();
+const getAddress = async () => {
+  const res = await getUserAddressAPI();
+  userAddress.value = res.result;
 
-  curAddress.value = checkInfo.value.userAddresses.find(
-    (item) => item.isDefault === 0
-  );
+  curAddress.value = userAddress.value?.find((item) => item.isDefault === 0);
 };
 
 onMounted(() => {
-  getCheckInfo();
+  getAddress();
 });
 
 const activeAddress = ref({});
@@ -33,29 +35,35 @@ const confirm = () => {
 };
 
 const router = useRouter();
-const cartStore = useCartStore();
 const createOrder = async () => {
-  const res = await createOrderAPI({
-    deliveryTimeType: 1,
-    payType: 1,
-    payChannel: 1,
-    buyerMessage: "",
-    goods: checkInfo.value.goods.map((item) => {
-      return {
-        skuId: item.skuId,
-        count: item.count,
-      };
-    }),
-    addressId: curAddress.value.id,
-  });
+  if (curAddress.value && payWay.value) {
+    const order = {
+      receiver: curAddress.value.receiver,
+      receiver_contact: curAddress.value.contact,
+      receiver_address: curAddress.value.address,
+      total_amount: cartStore.selectedPrice,
+      total_quantity: cartStore.selectedCount,
+      status: 1,
+      order_details: [],
+    };
 
-  const orderId = res.result.id;
-  router.push({
-    path: "/pay",
-    query: { orderId },
-  });
+    cartStore.selectedItem.forEach((item) => {
+      order.order_details.push({
+        id: item.id,
+        quantity: item.count,
+        unit_price: item.price,
+      });
+    });
 
-  cartStore.updateList();
+    const res = await createOrderAPI(order);
+    if (res.code === 0) {
+      router.push("/member/order");
+    } else {
+      ElMessage.error(res.message);
+    }
+  } else {
+    ElMessage.error("請正確填寫資料");
+  }
 };
 </script>
 
@@ -63,35 +71,6 @@ const createOrder = async () => {
   <div class="pay-checkout-page">
     <div class="container">
       <div class="wrapper">
-        <!-- 收穫地址 -->
-        <h3 class="box-title">收貨地址</h3>
-        <div class="box-body">
-          <div class="address">
-            <div class="text">
-              <div class="none" v-if="!curAddress">
-                您需要先新增收貨地址才可提交訂單。
-              </div>
-              <ul v-else>
-                <li>
-                  <span>收<i></i>貨<i></i>人：</span>{{ curAddress.receiver }}
-                </li>
-                <li><span>聯絡方式：</span>{{ curAddress.contact }}</li>
-                <li>
-                  <span>收貨地址：</span>{{ curAddress.fullLocation }}
-                  {{ curAddress.address }}
-                </li>
-              </ul>
-            </div>
-            <div class="action">
-              <el-button size="large" @click="showDialog = true"
-                >切換地址</el-button
-              >
-              <el-button size="large" @click="addFlag = true"
-                >添加地址</el-button
-              >
-            </div>
-          </div>
-        </div>
         <!-- 商品資訊 -->
         <h3 class="box-title">商品資訊</h3>
         <div class="box-body">
@@ -106,39 +85,69 @@ const createOrder = async () => {
               </tr>
             </thead>
             <tbody>
-              <tr v-for="i in checkInfo.goods" :key="i.id">
+              <tr v-for="i in cartStore.cartList" :key="i.id">
                 <td>
                   <a href="javascript:;" class="info">
-                    <img :src="i.picture" alt="" />
+                    <img :src="i.image_url" alt="" />
                     <div class="right">
                       <p>{{ i.name }}</p>
-                      <p>{{ i.attrsText }}</p>
                     </div>
                   </a>
                 </td>
-                <td>&yen;{{ i.price }}</td>
+                <td>${{ i.price }}</td>
                 <td>{{ i.count }}</td>
-                <td>&yen;{{ i.totalPrice }}</td>
-                <td>&yen;{{ i.totalPayPrice }}</td>
+                <td>${{ i.price * i.count }}</td>
+                <td>${{ i.price * i.count }}</td>
               </tr>
             </tbody>
           </table>
         </div>
-        <!-- 配送時間 -->
-        <h3 class="box-title">配送時間</h3>
+        <!-- 收穫地址 -->
+        <h3 class="box-title">收貨地址</h3>
         <div class="box-body">
-          <a class="my-btn active" href="javascript:;">
-            不限送貨時間：週一至週日
-          </a>
-          <a class="my-btn" href="javascript:;">平日送貨：週一至週五</a>
-          <a class="my-btn" href="javascript:;">雙休日、假日送貨：週六至週日</a>
+          <div class="address">
+            <div class="text">
+              <div class="none" v-if="!curAddress">
+                您需要先新增收貨地址才可提交訂單。
+              </div>
+              <ul v-else>
+                <li>
+                  <span>收<i></i>貨<i></i>人：</span>{{ curAddress.receiver }}
+                </li>
+                <li><span>聯絡方式：</span>{{ curAddress.contact }}</li>
+                <li>
+                  <span>收貨地址：</span>
+                  {{ curAddress.address }}
+                </li>
+              </ul>
+            </div>
+            <div class="action">
+              <el-button size="large" @click="showDialog = true"
+                >切換地址</el-button
+              >
+              <el-button size="large" @click="addFlag = true"
+                >添加地址</el-button
+              >
+            </div>
+          </div>
         </div>
         <!-- 付款方式 -->
         <h3 class="box-title">付款方式</h3>
         <div class="box-body">
-          <a class="my-btn active" href="javascript:;">線上付款</a>
-          <a class="my-btn" href="javascript:;">貨到付款</a>
-          <span style="color: #999">貨到付款要付5元手續費</span>
+          <a
+            class="my-btn"
+            :class="{ active: payWay === 0 }"
+            @click="payWay = 0"
+            href="javascript:;"
+            >線上付款</a
+          >
+          <a
+            class="my-btn"
+            :class="{ active: payWay === 1 }"
+            @click="payWay = 1"
+            href="javascript:;"
+            >貨到付款</a
+          >
         </div>
         <!-- 金額明細 -->
         <h3 class="box-title">金額明細</h3>
@@ -146,19 +155,19 @@ const createOrder = async () => {
           <div class="total">
             <dl>
               <dt>商品件數：</dt>
-              <dd>{{ checkInfo.summary?.goodsCount }}件</dd>
+              <dd>{{ cartStore.selectedCount }}件</dd>
             </dl>
             <dl>
               <dt>商品總價：</dt>
-              <dd>${{ checkInfo.summary?.totalPrice }}</dd>
+              <dd>${{ cartStore.selectedPrice }}</dd>
             </dl>
             <dl>
               <dt>運<i></i>費：</dt>
-              <dd>${{ checkInfo.summary?.postFee }}</dd>
+              <dd>${{ 0 }}</dd>
             </dl>
             <dl>
               <dt>應付總額：</dt>
-              <dd class="price">${{ checkInfo.summary?.totalPayPrice }}</dd>
+              <dd class="price">${{ cartStore.selectedPrice }}</dd>
             </dl>
           </div>
         </div>
@@ -177,7 +186,7 @@ const createOrder = async () => {
       <div class="addressWrapper">
         <div
           class="text item"
-          v-for="item in checkInfo.userAddresses"
+          v-for="item in userAddress"
           :key="item.id"
           @click="switchAddress(item)"
           :class="{ active: activeAddress.id === item.id }"
@@ -187,9 +196,7 @@ const createOrder = async () => {
               <span>收<i></i>貨<i></i>人：</span>{{ item.receiver }}
             </li>
             <li><span>聯絡方式：</span>{{ item.contact }}</li>
-            <li>
-              <span>收貨地址：</span>{{ item.fullLocation + item.address }}
-            </li>
+            <li><span>收貨地址：</span>{{ item.address }}</li>
           </ul>
         </div>
       </div>
@@ -302,17 +309,13 @@ const createOrder = async () => {
     img {
       width: 70px;
       height: 70px;
-      margin-right: 20px;
+      margin-right: 40px;
     }
 
     .right {
-      line-height: 24px;
-
-      p {
-        &:last-child {
-          color: #999;
-        }
-      }
+      display: flex;
+      align-items: center;
+      font-size: 20px;
     }
   }
 

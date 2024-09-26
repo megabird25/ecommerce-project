@@ -13,7 +13,7 @@ import java.util.List;
 @AllArgsConstructor
 public class CategoryGoods {
 
-    private Category subCategory;
+    private Category category;
     private List<Product> goods;
 
 }

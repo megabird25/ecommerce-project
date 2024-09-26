@@ -1,35 +1,27 @@
 import httpInstance from "@/utils/http.js";
 
-export const getCategoryAPI = (id) => {
+export const getCategoriesAPI = () => {
   return httpInstance({
     url: "/category",
-    params: {
-      id,
-    },
   });
 };
 
-export const getCategoryFilterAPI = (id) => {
+export const getCategoryAPI = (id) => {
   return httpInstance({
-    url: "/category/sub/filter",
-    params: {
-      id,
-    },
+    url: `/category/${id}`,
   });
 };
 
 /**
-@data { 
-  categoryId: 1005000 ,
-  page: 1,
-  pageSize: 20,
-  sortField: 'publishTime' | 'orderNum' | 'evaluateNum'
-} 
+ * @data {
+ *   page: 1,
+ *   pageSize: 20,
+ *   sortField: 'publishTime' | 'orderNum' | 'evaluateNum'
+ * }
  */
-export const getSubCategoryAPI = (data) => {
+export const getSubCategoryProductsAPI = (id, data) => {
   return httpInstance({
-    url: "/category/goods/temporary",
-    method: "POST",
-    data,
+    url: `/category/sub/${id}`,
+    params: data,
   });
 };

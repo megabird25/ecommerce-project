@@ -2,7 +2,7 @@
 import { onMounted, ref } from "vue";
 import { useRoute, onBeforeRouteUpdate } from "vue-router";
 import { ElMessage } from "element-plus";
-import { getDetail } from "@/apis/detail.js";
+import { getProductDetailAPI } from "@/apis/product";
 import DetailHot from "./components/DetailHot.vue";
 import ImageView from "./components/ImageView.vue";
 import { useCartStore } from "@/stores/cartStore.js";
@@ -10,8 +10,9 @@ import { useCartStore } from "@/stores/cartStore.js";
 const goods = ref({});
 const route = useRoute();
 const getGoods = async (id) => {
-  const res = await getDetail(id);
+  const res = await getProductDetailAPI(id);
   goods.value = res.result;
+  goods.value.image_url = Array(5).fill(goods.value.image_url); // 填充假數據
 };
 
 onMounted(() => {
@@ -22,49 +23,34 @@ onBeforeRouteUpdate((to) => {
   getGoods(to.params.id);
 });
 
-let skuObj = {};
-const changeSku = (sku) => {
-  skuObj = sku;
-};
-
 const count = ref(1);
-const countChange = (count) => {
-  console.log(count);
-};
-
 const cartStore = useCartStore();
 const addCart = () => {
-  if (skuObj.skuId) {
-    cartStore.addCart({
-      id: goods.value.id,
-      name: goods.value.name,
-      picture: goods.value.mainPictures[0],
-      price: goods.value.price,
-      count: count.value,
-      skuId: skuObj.skuId,
-      attrsText: skuObj.specsText,
-      selected: true,
-    });
-    ElMessage.success("已加入購物車");
-  } else {
-    ElMessage.warning("請選擇規格");
-  }
+  cartStore.addCart({
+    id: goods.value.id,
+    name: goods.value.name,
+    image_url: goods.value.image_url[0],
+    price: goods.value.price,
+    count: count.value,
+    selected: true,
+  });
+  ElMessage.success("已加入購物車");
 };
 </script>
 
 <template>
   <div class="goods-page">
-    <div class="container" v-if="goods.id === route.params.id">
+    <div class="container" v-if="goods.id == route.params.id">
       <div class="bread-container">
         <el-breadcrumb separator=">">
           <el-breadcrumb-item :to="{ path: '/' }">首頁</el-breadcrumb-item>
           <el-breadcrumb-item
-            :to="{ path: `/category/${goods.categories[1].id}` }"
-            >{{ goods.categories[1].name }}</el-breadcrumb-item
+            :to="{ path: `/category/${goods.category[1].id}` }"
+            >{{ goods.category[1].name }}</el-breadcrumb-item
           >
           <el-breadcrumb-item
-            :to="{ path: `/category/sub/${goods.categories[0].id}` }"
-            >{{ goods.categories[0].name }}</el-breadcrumb-item
+            :to="{ path: `/category/sub/${goods.category[0].id}` }"
+            >{{ goods.category[0].name }}</el-breadcrumb-item
           >
           <el-breadcrumb-item>{{ goods.name }}</el-breadcrumb-item>
         </el-breadcrumb>
@@ -73,21 +59,21 @@ const addCart = () => {
         <div>
           <div class="goods-info">
             <div class="media">
-              <ImageView :image-list="goods.mainPictures" />
+              <ImageView :image-list="goods.image_url" />
               <ul class="goods-sales">
                 <li>
                   <p>銷量人氣</p>
-                  <p>{{ goods.salesCount }}</p>
+                  <p>{{ goods.sales_count }}</p>
                   <p><i class="iconfont icon-task-filling"></i>銷量人氣</p>
                 </li>
                 <li>
                   <p>商品評價</p>
-                  <p>{{ goods.commentCount }}</p>
+                  <p>{{ goods.comment_count }}</p>
                   <p><i class="iconfont icon-comment-filling"></i>查看評價</p>
                 </li>
                 <li>
                   <p>收藏人氣</p>
-                  <p>{{ goods.collectCount }}</p>
+                  <p>{{ goods.collect_count }}</p>
                   <p><i class="iconfont icon-favorite-filling"></i>收藏商品</p>
                 </li>
                 <li>
@@ -99,10 +85,9 @@ const addCart = () => {
             </div>
             <div class="spec">
               <p class="g-name">{{ goods.name }}</p>
-              <p class="g-desc">{{ goods.desc }}</p>
+              <p class="g-desc">{{ goods.description }}</p>
               <p class="g-price">
                 <span>${{ goods.price }}</span>
-                <span>${{ goods.oldPrice }}</span>
               </p>
               <div class="g-service">
                 <dl>
@@ -119,8 +104,8 @@ const addCart = () => {
                   </dd>
                 </dl>
               </div>
-              <XtxSku :goods="goods" @change="changeSku" />
-              <el-input-number v-model="count" @change="countChange" />
+              <!-- <XtxSku :goods="goods" @change="changeSku" /> -->
+              <el-input-number class="inputNum" v-model="count" />
               <div>
                 <el-button size="large" class="btn" @click="addCart">
                   加入購物車
@@ -135,7 +120,7 @@ const addCart = () => {
                   <a>商品詳情</a>
                 </nav>
                 <div class="goods-detail">
-                  <ul class="attrs">
+                  <!-- <ul class="attrs">
                     <li
                       v-for="item in goods.details.properties"
                       :key="item.value"
@@ -143,9 +128,9 @@ const addCart = () => {
                       <span class="dt">{{ item.name }}</span>
                       <span class="dd">{{ item.value }}</span>
                     </li>
-                  </ul>
+                  </ul> -->
                   <img
-                    v-for="img in goods.details.pictures"
+                    v-for="img in goods.details"
                     :src="img"
                     :key="img"
                     alt=""
@@ -154,10 +139,7 @@ const addCart = () => {
               </div>
             </div>
             <div class="goods-aside">
-              <!-- 日熱銷榜 -->
-              <DetailHot :hot-type="1" />
-              <!-- 周熱銷榜 -->
-              <DetailHot :hot-type="2" />
+              <DetailHot :similar="goods.similar_products" />
             </div>
           </div>
         </div>
@@ -190,13 +172,13 @@ const addCart = () => {
     margin-top: 20px;
 
     .goods-article {
-      width: 940px;
+      width: 100%;
       margin-right: 20px;
       justify-content: center;
     }
 
     .goods-aside {
-      width: 280px;
+      width: 240px;
       min-height: 1000px;
     }
   }
@@ -236,21 +218,9 @@ const addCart = () => {
     margin-top: 10px;
 
     span {
-      &::before {
-        font-size: 14px;
-      }
-
-      &:first-child {
-        color: $priceColor;
-        margin-right: 10px;
-        font-size: 22px;
-      }
-
-      &:last-child {
-        color: #999;
-        text-decoration: line-through;
-        font-size: 16px;
-      }
+      color: $priceColor;
+      margin-right: 10px;
+      font-size: 22px;
     }
   }
 
@@ -396,7 +366,8 @@ const addCart = () => {
   }
 }
 
-.btn {
+.btn,
+.inputNum {
   margin-top: 20px;
 }
 

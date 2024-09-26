@@ -85,6 +85,20 @@ public class UserController {
         return Result.error("帳號或密碼不正確");
     }
 
+    @PostMapping("/logout")
+    public Result<User> logout(HttpServletResponse response) {
+        String id = ThreadLocalUtil.get().get("id").toString();
+        stringRedisTemplate.delete(id);
+
+        Cookie cookie = new Cookie("jwt_token", null);
+        cookie.setPath("/");
+        cookie.setHttpOnly(true);
+        cookie.setMaxAge(0);
+        response.addCookie(cookie);
+
+        return Result.success("已登出帳號");
+    }
+
     @PutMapping("/update")
     public Result<User> updateUserInfo(@RequestBody User userUpdatedData) {
         Map<String, Object> claims = ThreadLocalUtil.get();

@@ -1,71 +1,56 @@
 import { defineStore } from "pinia";
 import { ref, computed } from "vue";
-import { useUserStore } from "./userStore.js";
-import { insertCartAPI, fetchCartListAPI, delCartAPI } from "@/apis/cart.js";
 
 export const useCartStore = defineStore(
   "cart",
   () => {
-    const userStore = useUserStore();
-    const isLogin = computed(() => userStore.userInfo.token);
-
     // data
     const cartList = ref([]);
 
     // action
-    const addCart = async (goods) => {
-      if (isLogin.value) {
-        const { skuId, count } = goods;
-        await insertCartAPI({ skuId, count });
-        updateList();
+    const addCart = (goods) => {
+      const item = cartList.value.find((item) => goods.id === item.id);
+      if (item) {
+        item.count += goods.count;
       } else {
-        const item = cartList.value.find((item) => goods.skuId === item.skuId);
-        if (item) {
-          item.count += goods.count;
-        } else {
-          cartList.value.push(goods);
-        }
+        cartList.value.push(goods);
       }
     };
-    const delCart = async (skuId) => {
-      if (isLogin.value) {
-        await delCartAPI([skuId]);
-        updateList();
-      } else {
-        const index = cartList.value.findIndex((item) => {
-          skuId === item.skuId;
-        });
-        cartList.value.splice(index, 1);
-      }
+
+    const delCart = (id) => {
+      const index = cartList.value.findIndex((item) => {
+        id === item.id;
+      });
+      cartList.value.splice(index, 1);
     };
+
     const clearCart = () => {
       cartList.value = [];
     };
+
     const allCheck = (selected) => {
       cartList.value.forEach((item) => (item.selected = selected));
-    };
-
-    const updateList = async () => {
-      const res = await fetchCartListAPI();
-      cartList.value = res.result;
     };
 
     // getter
     const allCount = computed(() =>
       cartList.value.reduce((a, c) => a + c.count, 0)
     );
+
     const allPrice = computed(() =>
       cartList.value.reduce((a, c) => a + c.count * c.price, 0)
     );
-    const selectedCount = computed(() =>
-      cartList.value
-        .filter((item) => item.selected)
-        .reduce((a, c) => a + c.count, 0)
+
+    const selectedItem = computed(() =>
+      cartList.value.filter((item) => item.selected)
     );
+
+    const selectedCount = computed(() =>
+      selectedItem.value.reduce((a, c) => a + c.count, 0)
+    );
+
     const selectedPrice = computed(() =>
-      cartList.value
-        .filter((item) => item.selected)
-        .reduce((a, c) => a + c.count * c.price, 0)
+      selectedItem.value.reduce((a, c) => a + c.count * c.price, 0)
     );
 
     const isAll = computed(() => cartList.value.every((item) => item.selected));
@@ -74,6 +59,7 @@ export const useCartStore = defineStore(
       cartList,
       allCount,
       allPrice,
+      selectedItem,
       selectedCount,
       selectedPrice,
       isAll,
@@ -81,7 +67,6 @@ export const useCartStore = defineStore(
       delCart,
       clearCart,
       allCheck,
-      updateList,
     };
   },
   { persist: true }

@@ -1,46 +1,23 @@
 <script setup>
-import { fetchHotGoodsAPI } from "@/apis/detail.js";
-import { computed, onMounted, ref } from "vue";
-import { useRoute } from "vue-router";
-
-const props = defineProps({
-  hotType: {
-    type: Number,
+defineProps({
+  similar: {
+    type: Array,
   },
-});
-const TYPEMAP = {
-  1: "日熱銷榜",
-  2: "周熱銷榜",
-};
-const title = computed(() => TYPEMAP[props.hotType]);
-
-const hotList = ref([]);
-const route = useRoute();
-const getHotList = async () => {
-  const res = await fetchHotGoodsAPI({
-    id: route.params.id,
-    type: props.hotType,
-  });
-  hotList.value = res.result;
-};
-
-onMounted(() => {
-  getHotList(route.params.id);
 });
 </script>
 
 <template>
   <div class="goods-hot">
-    <h3>{{ title }}</h3>
+    <h3>相關商品</h3>
     <RouterLink
       :to="`/detail/${item.id}`"
       class="goods-item"
-      v-for="item in hotList"
+      v-for="item in similar"
       :key="item.id"
     >
-      <img :src="item.picture" alt="" />
+      <img :src="item.image_url" alt="" />
       <p class="name ellipsis">{{ item.name }}</p>
-      <p class="desc ellipsis">{{ item.desc }}</p>
+      <p class="desc ellipsis">{{ item.description }}</p>
       <p class="price">${{ item.price }}</p>
     </RouterLink>
   </div>
@@ -48,19 +25,25 @@ onMounted(() => {
 
 <style scoped lang="scss">
 .goods-hot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
   h3 {
     height: 70px;
+    width: 100%;
     background: $helpColor;
     color: #fff;
     font-size: 18px;
     line-height: 70px;
     padding-left: 25px;
     margin-bottom: 10px;
-    font-weight: normal;
+    font-weight: bolder;
   }
 
   .goods-item {
     display: block;
+    width: 100%;
     padding: 20px 30px;
     text-align: center;
     background: #fff;

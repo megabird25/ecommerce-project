@@ -1,22 +1,24 @@
 import httpInstance from "@/utils/http.js";
 
-export const getBannerAPI = (params = {}) => {
-  const { distributionSite = "1" } = params;
+export const getBannerAPI = () => {
   return httpInstance({
     url: "/home/banner",
-    params: {
-      distributionSite,
-    },
   });
 };
 
-export const findNewAPI = () => {
+export const getHeadAPI = () => {
+  return httpInstance({
+    url: "/home/head"
+  })
+}
+
+export const getNewAPI = () => {
   return httpInstance({
     url: "/home/new",
   });
 };
 
-export const findHotAPI = () => {
+export const getHotAPI = () => {
   return httpInstance({
     url: "/home/hot",
   });

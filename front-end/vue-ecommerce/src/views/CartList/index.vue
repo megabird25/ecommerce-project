@@ -26,7 +26,7 @@ const allCheck = (selected) => {
               <th width="220">單價</th>
               <th width="180">數量</th>
               <th width="180">總計</th>
-              <th width="140">操作</th>
+              <th width="140">刪除</th>
             </tr>
           </thead>
           <!-- 商品列表 -->
@@ -38,7 +38,7 @@ const allCheck = (selected) => {
               <td>
                 <div class="goods">
                   <RouterLink :to="`/detail/${i.id}`">
-                    <img :src="i.picture" alt="" />
+                    <img :src="i.image_url" alt="" />
                   </RouterLink>
                   <div>
                     <p class="name ellipsis">{{ i.name }}</p>
@@ -58,7 +58,7 @@ const allCheck = (selected) => {
                 <a href="javascript:;">
                   <i
                     class="fa-regular fa-circle-xmark fa-xl"
-                    @click="cartStore.delCart(i.skuId)"
+                    @click="cartStore.delCart(i.id)"
                   ></i>
                 </a>
               </td>

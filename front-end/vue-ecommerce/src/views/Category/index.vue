@@ -1,9 +1,23 @@
 <script setup>
-import { useBanner } from "./composables/useBanner.js";
-import { useCategory } from "./composables/useCategory.js";
+import { onMounted, ref } from "vue";
+import { useRoute, onBeforeRouteUpdate } from "vue-router";
+import { getCategoryAPI } from "@/apis/category.js";
 
-const { categoryData } = useCategory();
-const { bannerList } = useBanner();
+const categoryData = ref({});
+
+const getCategory = async (id) => {
+  const res = await getCategoryAPI(id);
+  categoryData.value = res.result;
+};
+
+const route = useRoute();
+onMounted(() => {
+  getCategory(route.params.id);
+});
+
+onBeforeRouteUpdate((to) => {
+  getCategory(to.params.id);
+});
 </script>
 
 <template>
@@ -15,20 +29,20 @@ const { bannerList } = useBanner();
           <el-breadcrumb-item>{{ categoryData.name }}</el-breadcrumb-item>
         </el-breadcrumb>
       </div>
-      <div class="home-banner">
+      <!-- <div class="home-banner">
         <el-carousel height="500px">
           <el-carousel-item v-for="item in bannerList" :key="item.id">
             <img :src="item.imgUrl" alt="" />
           </el-carousel-item>
         </el-carousel>
-      </div>
+      </div> -->
       <div class="sub-list">
         <h3>全部分類</h3>
         <ul>
-          <li v-for="i in categoryData.children" :key="i.id">
-            <RouterLink :to="`/category/sub/${i.id}`">
-              <img :src="i.picture" />
-              <p>{{ i.name }}</p>
+          <li v-for="i in categoryData.children" :key="i.category.id">
+            <RouterLink :to="`/category/sub/${i.category.id}`">
+              <img :src="i.category.image_url" />
+              <p>{{ i.category.name }}</p>
             </RouterLink>
           </li>
         </ul>
@@ -39,7 +53,7 @@ const { bannerList } = useBanner();
         :key="item.id"
       >
         <div class="head">
-          <h3>- {{ item.name }}-</h3>
+          <h3>- {{ item.category.name }}-</h3>
         </div>
         <div class="body">
           <GoodsItem v-for="good in item.goods" :good="good" :key="good.id" />

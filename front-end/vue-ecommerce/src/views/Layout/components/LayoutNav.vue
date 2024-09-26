@@ -1,12 +1,12 @@
 <script setup>
-import { RouterLink, useRouter } from "vue-router";
+import { RouterLink } from "vue-router";
 import { useUserStore } from "@/stores/userStore.js";
+import { ElMessage } from "element-plus";
 
 const userStore = useUserStore();
-const router = useRouter();
-const confirm = () => {
-  userStore.clearUserInfo();
-  router.push("/login");
+const confirm = async () => {
+  const res = await userStore.logoutUser();
+  ElMessage({ type: "success", message: res.message });
 };
 </script>
 
@@ -14,11 +14,11 @@ const confirm = () => {
   <nav class="app-topnav">
     <div class="container">
       <ul>
-        <template v-if="userStore.userInfo.token">
+        <template v-if="userStore.userInfo.username">
           <li>
             <p>
               <i class="fa-regular fa-user"></i>
-              {{ userStore.userInfo.account }}
+              {{ userStore.userInfo.username }}
             </p>
           </li>
           <li><RouterLink to="/member/user">會員中心</RouterLink></li>

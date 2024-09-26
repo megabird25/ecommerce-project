@@ -2,7 +2,6 @@
 import { useUserStore } from '@/stores/userStore.js';
 const userStore = useUserStore();
 
-const likeList = [];
 </script>
 
 <template>
@@ -16,11 +15,11 @@ const likeList = [];
     <div class="item">
       <a href="javascript:;">
         <span class="iconfont fa-solid fa-user-group"></span>
-        <p>會員中心</p>
+        <p>會員資料</p>
       </a>
       <a href="javascript:;">
-        <span class="iconfont fa-solid fa-shield"></span>
-        <p>安全設置</p>
+        <span class="iconfont fa-solid fa-key"></span>
+        <p>更改密碼</p>
       </a>
       <a href="javascript:;">
         <span class="iconfont fa-solid fa-location-dot"></span>
@@ -28,7 +27,7 @@ const likeList = [];
       </a>
     </div>
   </div>
-  <div class="like-container">
+  <!-- <div class="like-container">
     <div class="home-panel">
       <div class="header">
         <h4 data-v-bcb266e0="">猜你喜欢</h4>
@@ -37,7 +36,7 @@ const likeList = [];
         <GoodsItem v-for="good in likeList" :key="good.id" :good="good" />
       </div>
     </div>
-  </div>
+  </div> -->
 </template>
 
 <style scoped lang="scss">

@@ -1,12 +1,36 @@
 import httpInstance from "@/utils/http.js";
 
-export const loginAPI = ({ account, password }) => {
+/**
+ * @data {
+ *   username: happy123,
+ *   password: 123456,
+ * }
+ */
+export const registerAPI = (data) => {
   return httpInstance({
-    url: "/login",
+    url: "/user/register",
     method: "POST",
-    data: {
-      account,
-      password,
-    },
+    data,
+  });
+};
+
+/**
+ * @data {
+ *   username: happy123,
+ *   password: 123456,
+ * }
+ */
+export const loginAPI = (data) => {
+  return httpInstance({
+    url: "/user/login",
+    method: "POST",
+    data,
+  });
+};
+
+export const logoutAPI = () => {
+  return httpInstance({
+    url: "/user/logout",
+    method: "POST",
   });
 };

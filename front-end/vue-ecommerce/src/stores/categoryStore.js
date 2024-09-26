@@ -1,12 +1,12 @@
 import { ref } from "vue";
 import { defineStore } from "pinia";
-import { getCategoryAPI } from "@/apis/layout.js";
+import { getCategoriesAPI } from "@/apis/category.js";
 
 export const useCategoryStore = defineStore("category", () => {
   const categoryList = ref([]);
 
   const getCategory = async () => {
-    const res = await getCategoryAPI();
+    const res = await getCategoriesAPI();
     categoryList.value = res.result;
   };
 

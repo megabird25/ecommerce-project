@@ -7,9 +7,8 @@ const tabTypes = [
   { name: "unpay", label: "待付款" },
   { name: "deliver", label: "待出貨" },
   { name: "receive", label: "待收貨" },
-  { name: "comment", label: "待評價" },
-  { name: "complete", label: "完成" },
-  { name: "cancel", label: "已取消" },
+  { name: "complete", label: "已完成" },
+  { name: "cancel", label: "取消" },
 ];
 
 const orderList = ref([]);

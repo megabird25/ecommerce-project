@@ -7,6 +7,7 @@ import java.util.List;
 @Data
 public class PageResponse<T> {
 
+    private String title;
     private Integer page;
     private Integer pageSize;
     private Long total;

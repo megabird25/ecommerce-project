@@ -1,8 +1,7 @@
 import { defineStore } from "pinia";
 import { ref } from "vue";
-import { loginAPI } from "@/apis/user.js";
 import { useCartStore } from "./cartStore.js";
-import { mergeCartAPI } from "@/apis/cart.js";
+import { loginAPI, logoutAPI } from "@/apis/user.js";
 
 export const useUserStore = defineStore(
   "user",
@@ -11,20 +10,10 @@ export const useUserStore = defineStore(
 
     const userInfo = ref({});
 
-    const getUserInfo = async ({ account, password }) => {
-      const res = await loginAPI({ account, password });
+    const getUserInfo = async (data) => {
+      const res = await loginAPI(data);
       userInfo.value = res.result;
-
-      await mergeCartAPI(
-        cartStore.cartList.map((item) => {
-          return {
-            skuId: item.skuId,
-            selected: item.selected,
-            count: item.count,
-          };
-        })
-      );
-      cartStore.updateList();
+      return res;
     };
 
     const clearUserInfo = () => {
@@ -32,10 +21,23 @@ export const useUserStore = defineStore(
       cartStore.clearCart();
     };
 
+    const logoutUser = async () => {
+      const res = await logoutAPI();
+      userInfo.value = {};
+      cartStore.clearCart();
+      return res;
+    };
+
+    const isAuthenticated = () => {
+      return !!userInfo.value.username;
+    };
+
     return {
       userInfo,
       getUserInfo,
       clearUserInfo,
+      logoutUser,
+      isAuthenticated,
     };
   },
   { persist: true }

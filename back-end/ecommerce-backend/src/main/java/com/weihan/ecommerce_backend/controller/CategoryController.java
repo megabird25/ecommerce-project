@@ -12,9 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @RestController
 @RequestMapping("/category")
@@ -36,7 +34,7 @@ public class CategoryController {
     }
 
     @GetMapping("/{id}")
-    public Result<List<CategoryGoods>> getCategoryPage(@PathVariable Integer id) {
+    public Result<Map<String, Object>> getCategoryPage(@PathVariable Integer id) {
         Optional<Category> categoryOpt = categoryService.findById(id);
         if (categoryOpt.isPresent()) {
             Category category = categoryOpt.get();
@@ -49,7 +47,12 @@ public class CategoryController {
                     categoryGoodsList.add(new CategoryGoods(subCategory, goods));
                 }
 
-                return Result.success("獲取成功", categoryGoodsList);
+                Map<String, Object> result = new HashMap<>();
+                result.put("id", category.getId());
+                result.put("name", category.getName());
+                result.put("children", categoryGoodsList);
+
+                return Result.success("獲取成功", result);
             }
         }
 

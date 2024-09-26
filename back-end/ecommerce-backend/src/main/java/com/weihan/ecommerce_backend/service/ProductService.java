@@ -20,4 +20,6 @@ public interface ProductService {
     List<Product> getProducts(Integer num);
 
     List<Product> getProductsByCategoryId(List<Integer> ids, Integer num);
+
+    Optional<Product> findById(Integer id);
 }

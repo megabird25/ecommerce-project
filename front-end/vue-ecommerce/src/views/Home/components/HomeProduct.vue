@@ -16,13 +16,13 @@ onMounted(() => {
 
 <template>
   <div class="home-product">
-    <HomePanel :title="cate.name" v-for="cate in goodsProduct" :key="cate.id">
+    <HomePanel :title="cate.category.name" v-for="cate in goodsProduct" :key="cate.category.id">
       <div class="box">
-        <RouterLink class="cover" :to="`/category/${cate.id}`">
-          <img v-img-lazy="cate.picture" />
+        <RouterLink class="cover" :to="`/category/${cate.category.id}`">
+          <img v-img-lazy="cate.category.image_url" />
           <strong class="label">
-            <span>{{ cate.name }}館</span>
-            <span>{{ cate.saleInfo }}</span>
+            <span>{{ cate.category.name }}館</span>
+            <!-- <span>{{ cate.saleInfo }}</span> -->
           </strong>
         </RouterLink>
         <ul class="goods-list">
