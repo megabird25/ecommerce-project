@@ -13,6 +13,9 @@ import Checkout from "@/views/Checkout/index.vue";
 import Member from "@/views/Member/index.vue";
 import UserInfo from "@/views/Member/components/UserInfo.vue";
 import UserOrder from "@/views/Member/components/UserOrder.vue";
+import UpdateInfo from "@/views/Member/components/user/UpdateInfo.vue";
+import ResetPassword from "@/views/Member/components/user/ResetPassword.vue";
+import AddressManage from "@/views/Member/components/user/AddressManage.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -27,13 +30,21 @@ const router = createRouter({
         { path: "search", component: Search },
         { path: "detail/:id", component: Detail },
         { path: "cartlist", component: CartList },
-        { path: "checkout", component: Checkout },
+        { path: "checkout", component: Checkout, meta: { requiresAuth: true } },
         {
           path: "member",
           component: Member,
           meta: { requiresAuth: true },
           children: [
-            { path: "user", component: UserInfo },
+            {
+              path: "user",
+              component: UserInfo,
+              children: [
+                { path: "info", component: UpdateInfo },
+                { path: "password", component: ResetPassword },
+                { path: "address", component: AddressManage },
+              ],
+            },
             { path: "order", component: UserOrder },
           ],
         },

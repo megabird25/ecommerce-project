@@ -4,7 +4,7 @@ import { useRouter } from "vue-router";
 import { useCartStore } from "@/stores/cartStore.js";
 import { getUserAddressAPI } from "@/apis/address.js";
 import { ElMessage } from "element-plus";
-import { createOrderAPI } from "@/apis/order";
+import { sendOrderAPI } from "@/apis/order";
 
 const showDialog = ref(false);
 const payWay = ref(null);
@@ -55,7 +55,7 @@ const createOrder = async () => {
       });
     });
 
-    const res = await createOrderAPI(order);
+    const res = await sendOrderAPI(order);
     if (res.code === 0) {
       router.push("/member/order");
     } else {

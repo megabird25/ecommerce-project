@@ -34,3 +34,27 @@ export const logoutAPI = () => {
     method: "POST",
   });
 };
+
+export const updateInfoAPI = (data) => {
+  return httpInstance({
+    url: "/user/update",
+    method: "PUT",
+    data,
+  });
+};
+
+export const resetPassword = (data) => {
+  return httpInstance({
+    url: "user/password",
+    method: "PATCH",
+    data,
+  });
+};
+
+export const uploadAvatarAPI = (upload) => {
+  return httpInstance({
+    url: "user/avatar",
+    method: "PATCH",
+    data: upload,
+  });
+};

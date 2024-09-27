@@ -25,7 +25,7 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public PageResponse<Order> findByUserId(Integer userId, Pageable pageable, String status) {
         Page<Order> orders = null;
-        if (status.equals("all")) {
+        if (status.equals("0")) {
             orders = orderRepository.findByUserId(userId, pageable);
         } else {
             orders = orderRepository.findByUserIdAndStatus(userId, pageable, status);

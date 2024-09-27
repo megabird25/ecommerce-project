@@ -7,7 +7,7 @@ export const getUserOrderAPI = (params) => {
   });
 };
 
-export const createOrderAPI = (data) => {
+export const sendOrderAPI = (data) => {
   return httpInstance({
     url: "/user/order",
     method: "POST",

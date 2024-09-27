@@ -14,14 +14,15 @@ const tabTypes = [
 const orderList = ref([]);
 const total = ref(0);
 const params = ref({
-  orderState: 0,
+  status: 0,
   page: 1,
   pageSize: 2,
 });
 const getOrderList = async () => {
-  const res = await getUserOrderAPI(params);
-  orderList.value = res.result.items;
-  total.value = res.result.counts;
+  const res = await getUserOrderAPI(params.value);
+  orderList.value = res.result.data;
+  console.log(orderList.value);
+  total.value = res.result.total;
 };
 
 onMounted(() => {
@@ -29,21 +30,20 @@ onMounted(() => {
 });
 
 const tabChange = (type) => {
-  params.value.orderState = type;
+  params.value.status = type;
   getOrderList();
 };
 
-const fomartPayState = (payState) => {
-  const stateMap = {
-    1: "待付款",
-    2: "待出貨",
-    3: "待收貨",
-    4: "待評價",
-    5: "已完成",
-    6: "已取消",
-  };
-  return stateMap[payState];
-};
+// const fomartPayState = (payState) => {
+//   const stateMap = {
+//     1: "待付款",
+//     2: "待出貨",
+//     3: "待收貨",
+//     4: "已完成",
+//     5: "已取消",
+//   };
+//   return stateMap[payState];
+// };
 </script>
 
 <template>
@@ -62,80 +62,67 @@ const fomartPayState = (payState) => {
           <!-- 訂單列表 -->
           <div class="order-item" v-for="order in orderList" :key="order.id">
             <div class="head">
-              <span>下單時間：{{ order.createTime }}</span>
+              <span>下單時間：{{ order.order_date }}</span>
               <span>訂單編號：{{ order.id }}</span>
-              <span class="down-time" v-if="order.orderState === 1">
+              <!-- <span class="down-time" v-if="order.orderState === 1">
                 <i class="iconfont icon-down-time"></i>
                 <b>付款截止： {{ order.countdown }}</b>
-              </span>
+              </span> -->
             </div>
             <div class="body">
               <div class="column goods">
                 <ul>
-                  <li v-for="item in order.skus" :key="item.id">
-                    <a class="image" href="javascript:;">
-                      <img :src="item.image" alt="" />
-                    </a>
-                    <div class="info">
-                      <p class="name ellipsis-2">
-                        {{ item.name }}
-                      </p>
-                      <p class="attr ellipsis">
-                        <span>{{ item.attrsText }}</span>
-                      </p>
-                    </div>
-                    <div class="price">${{ item.realPay }}</div>
+                  <li v-for="item in order.order_details" :key="item.id">
+                    <RouterLink
+                      class="image"
+                      :to="`/detail/${item.product.id}`"
+                    >
+                      <img :src="item.product.image_url" alt="" />
+                    </RouterLink>
+                    <div class="info">{{ item.product.name }}</div>
+                    <div class="price">${{ item.unit_price }}</div>
                     <div class="count">x{{ item.quantity }}</div>
                   </li>
                 </ul>
               </div>
-              <div class="column state">
-                <!-- 调用函数适配显示 -->
+              <!-- 呼叫函數適配顯示 -->
+              <!-- <div class="column state">
                 <p>{{ fomartPayState(order.orderState) }}</p>
                 <p v-if="order.orderState === 3">
                   <a href="javascript:;" class="green">查看物流</a>
                 </p>
                 <p v-if="order.orderState === 4">
-                  <a href="javascript:;" class="green">评价商品</a>
+                  <a href="javascript:;" class="green">評價商品</a>
                 </p>
                 <p v-if="order.orderState === 5">
-                  <a href="javascript:;" class="green">查看评价</a>
+                  <a href="javascript:;" class="green">查看評價</a>
                 </p>
-              </div>
+              </div> -->
               <div class="column amount">
-                <p class="red">¥{{ order.payMoney }}</p>
-                <p>（含运费：¥{{ order.postFee }}）</p>
-                <p>在线支付</p>
+                <p>訂單金額：</p>
+                <p class="red">${{ order.total_amount }}</p>
               </div>
               <div class="column action">
-                <el-button
-                  v-if="order.orderState === 1"
-                  type="primary"
-                  size="small"
-                >
+                <el-button v-if="order.status == 1" type="primary" size="small">
                   立即付款
                 </el-button>
-                <el-button
-                  v-if="order.orderState === 3"
-                  type="primary"
-                  size="small"
-                >
-                  确认收货
+                <el-button v-if="order.status == 3" type="primary" size="small">
+                  確認收貨
                 </el-button>
-                <p><a href="javascript:;">查看详情</a></p>
-                <p v-if="[2, 3, 4, 5].includes(order.orderState)">
-                  <a href="javascript:;">再次购买</a>
+                <p><a href="javascript:;">查看詳情</a></p>
+                <p v-if="[4, 5].includes(order.status)">
+                  <a href="javascript:;">再次訂購</a>
                 </p>
-                <p v-if="[4, 5].includes(order.orderState)">
-                  <a href="javascript:;">申请售后</a>
+                <p v-if="[4, 5].includes(order.status)">
+                  <a href="javascript:;">申請售後</a>
                 </p>
-                <p v-if="order.orderState === 1">
-                  <a href="javascript:;">取消订单</a>
+                <p v-if="order.status == 1">
+                  <a href="javascript:;">取消訂單</a>
                 </p>
               </div>
             </div>
           </div>
-          <!-- 分页 -->
+          <!-- 分頁 -->
           <div class="pagination-container">
             <el-pagination
               :total="total"
@@ -247,35 +234,23 @@ const fomartPayState = (payState) => {
               border: 1px solid #f5f5f5;
             }
 
-            .info {
-              width: 220px;
-              text-align: left;
+            div {
+              display: flex;
+              align-items: center;
               padding: 0 10px;
 
-              p {
-                margin-bottom: 5px;
-
-                &.name {
-                  height: 38px;
-                }
-
-                &.attr {
-                  color: #999;
-                  font-size: 12px;
-
-                  span {
-                    margin-right: 5px;
-                  }
-                }
+              &.info {
+                width: 220px;
+                font-size: 18px;
               }
-            }
 
-            .price {
-              width: 100px;
-            }
+              &.price {
+                width: 100px;
+              }
 
-            .count {
-              width: 80px;
+              &.count {
+                width: 80px;
+              }
             }
           }
         }
@@ -290,9 +265,13 @@ const fomartPayState = (payState) => {
       }
 
       &.amount {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
         width: 200px;
 
         .red {
+          font-size: 25px;
           color: $priceColor;
         }
       }

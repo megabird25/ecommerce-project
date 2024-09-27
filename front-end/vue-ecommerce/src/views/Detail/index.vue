@@ -3,9 +3,10 @@ import { onMounted, ref } from "vue";
 import { useRoute, onBeforeRouteUpdate } from "vue-router";
 import { ElMessage } from "element-plus";
 import { getProductDetailAPI } from "@/apis/product";
+import { useCartStore } from "@/stores/cartStore.js";
+
 import DetailHot from "./components/DetailHot.vue";
 import ImageView from "./components/ImageView.vue";
-import { useCartStore } from "@/stores/cartStore.js";
 
 const goods = ref({});
 const route = useRoute();

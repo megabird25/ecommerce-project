@@ -120,7 +120,7 @@ public class UserController {
     }
 
     @PatchMapping("/password")
-    public Result<String> updateUserPassword(@RequestBody Map<String, String> userData) {
+    public Result<String> resetUserPassword(@RequestBody Map<String, String> userData) {
         Map<String, Object> claims = ThreadLocalUtil.get();
         Integer id = (Integer) claims.get("id");
         Optional<User> userOpt = userService.findById(id);

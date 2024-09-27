@@ -61,13 +61,21 @@ public class OrderController {
     public Result<PageResponse<Order>> getOrder(
             @RequestParam Integer page,
             @RequestParam(defaultValue = "10") Integer pageSize,
-            @RequestParam(defaultValue = "all") String status
+            @RequestParam(defaultValue = "0") String status
     ) {
         Map<String, Object> claims = ThreadLocalUtil.get();
         Integer userId = (Integer) claims.get("id");
 
         Pageable pageable = PageRequest.of(page - 1, pageSize, Sort.by("id").descending());
         PageResponse<Order> orders = orderService.findByUserId(userId, pageable, status);
+
+        List<Order> orderList = orders.getData();
+        for (Order order : orderList) {
+            List<OrderDetail> orderDetails = order.getOrderDetails();
+            for (OrderDetail orderDetail : orderDetails) {
+                orderDetail.setOrder(null);
+            }
+        }
 
         return Result.success("獲取成功", orders);
     }

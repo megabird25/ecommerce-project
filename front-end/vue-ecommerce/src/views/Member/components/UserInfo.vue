@@ -10,22 +10,25 @@ const userStore = useUserStore();
       <div class="avatar">
         <img :src="userStore.userInfo?.avatar" />
       </div>
-      <h4>{{ userStore.userInfo?.account }}</h4>
+      <h4>{{ userStore.userInfo.username }}</h4>
     </div>
     <div class="item">
-      <a href="javascript:;">
+      <router-link to="/member/user/info">
         <span class="iconfont fa-solid fa-user-group"></span>
         <p>會員資料</p>
-      </a>
-      <a href="javascript:;">
+      </router-link>
+      <router-link to="/member/user/password">
         <span class="iconfont fa-solid fa-key"></span>
         <p>更改密碼</p>
-      </a>
-      <a href="javascript:;">
+      </router-link>
+      <router-link to="/member/user/address">
         <span class="iconfont fa-solid fa-location-dot"></span>
         <p>地址管理</p>
-      </a>
+      </router-link>
     </div>
+  </div>
+  <div>
+    <RouterView/>
   </div>
   <!-- <div class="like-container">
     <div class="home-panel">
