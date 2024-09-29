@@ -50,7 +50,7 @@ const rules = {
   rePassword: [{ validator: checkRePassword, trigger: "blur" }],
 };
 
-const formRef = ref(false);
+const formRef = ref({});
 const userStore = useUserStore();
 const router = useRouter();
 const doLogin = () => {
@@ -83,7 +83,6 @@ const doLogin = () => {
           :rules="rules"
           label-position="right"
           label-width="auto"
-          status-icon
           ref="formRef"
         >
           <el-form-item prop="username">

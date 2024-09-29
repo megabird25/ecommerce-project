@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from "vue-router";
-// import { useUserStore } from "@/stores/userStore";
+import { useUserStore } from "@/stores/userStore";
 
 import Login from "@/views/Login/index.vue";
 import Layout from "@/views/Layout/index.vue";
@@ -39,6 +39,7 @@ const router = createRouter({
             {
               path: "user",
               component: UserInfo,
+              redirect: "/member/user/info",
               children: [
                 { path: "info", component: UpdateInfo },
                 { path: "password", component: ResetPassword },
@@ -50,7 +51,7 @@ const router = createRouter({
         },
       ],
     },
-    { path: "/login", component: Login },
+    { path: "/login", component: Login, meta: { requiresUnauth: true } },
   ],
   scrollBehavior() {
     return {
@@ -59,12 +60,14 @@ const router = createRouter({
   },
 });
 
-// router.beforeEach((to, _, next) => {
-//   if (to.meta.requiresAuth && !useUserStore().isAuthenticated()) {
-//     next('/login');
-//   } else {
-//     next();
-//   }
-// });
+router.beforeEach((to, _, next) => {
+  if (to.meta.requiresAuth && !useUserStore().isAuthenticated()) {
+    next("/login");
+  } else if (to.meta.requiresUnauth && useUserStore().isAuthenticated()) {
+    next("/");
+  } else {
+    next();
+  }
+});
 
 export default router;

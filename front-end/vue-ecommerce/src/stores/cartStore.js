@@ -32,6 +32,10 @@ export const useCartStore = defineStore(
       cartList.value.forEach((item) => (item.selected = selected));
     };
 
+    const removeSelected = () => {
+      cartList.value = cartList.value.filter((item) => (item.selected === false));
+    };
+
     // getter
     const allCount = computed(() =>
       cartList.value.reduce((a, c) => a + c.count, 0)
@@ -67,6 +71,7 @@ export const useCartStore = defineStore(
       delCart,
       clearCart,
       allCheck,
+      removeSelected,
     };
   },
   { persist: true }

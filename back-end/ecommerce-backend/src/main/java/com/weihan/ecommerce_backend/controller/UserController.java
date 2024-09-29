@@ -144,7 +144,7 @@ public class UserController {
         return Result.error("找不到該用戶");
     }
 
-    @PatchMapping("/avatar")
+    @PostMapping("/avatar")
     public Result<String> updateUserAvatar(@RequestParam("file") MultipartFile file) throws IOException {
         if (file.isEmpty()) {
             Result.error("找不到檔案");

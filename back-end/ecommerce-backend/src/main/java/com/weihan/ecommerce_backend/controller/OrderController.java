@@ -54,7 +54,7 @@ public class OrderController {
 
         Order createdOrder = orderService.save(order);
 
-        return Result.success("操作成功", createdOrder);
+        return Result.success("操作成功");
     }
 
     @GetMapping

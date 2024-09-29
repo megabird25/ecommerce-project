@@ -4,7 +4,7 @@ import router from "@/router";
 import { useUserStore } from "@/stores/userStore";
 
 const httpInstance = axios.create({
-  baseURL: "http://localhost:8080/api",
+  baseURL: "/api",
   timeout: 5000,
   withCredentials: true,
 });

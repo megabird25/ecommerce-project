@@ -3,7 +3,7 @@ import { ref } from "vue";
 import { ElMessage } from "element-plus";
 import { Plus } from "@element-plus/icons-vue";
 import { useUserStore } from "@/stores/userStore";
-import { updateInfoAPI, uploadAvatarAPI } from "@/apis/user";
+import { updateInfoAPI } from "@/apis/user";
 
 const userStore = useUserStore();
 const userInfo = ref({ ...userStore.userInfo });
@@ -19,11 +19,10 @@ const rules = {
   ],
 };
 
-const formRef = ref(false);
+const formRef = ref({});
 const updateUserInfo = async () => {
   formRef.value.validate(async (valid) => {
     if (valid) {
-      console.log(userInfo.value);
       const res = await updateInfoAPI(userInfo.value);
       userStore.userInfo = res.result;
       ElMessage.success("修改成功");
@@ -42,16 +41,10 @@ const beforeAvatarUpload = (rawFile) => {
   return true;
 };
 
-const uploadAvatar = async ({ file }) => {
-  const res = await uploadAvatarAPI(file);
-  userStore.userInfo.image_url = res.result;
-  userInfo.value.image_url = res.result;
-};
-
-const handleAvatarSuccess = () => (response, uploadFile) => {
-  ElMessage.success("修改成功");
-  console.log(response);
-  console.log(uploadFile);
+const handleAvatarSuccess = (response) => {
+  userInfo.value.avatar = response.result;
+  userStore.userInfo.avatar = response.result;
+  ElMessage.success("修改成功，請重新載入");
 };
 </script>
 <template>
@@ -102,12 +95,13 @@ const handleAvatarSuccess = () => (response, uploadFile) => {
       <el-col :span="8">
         <el-upload
           class="avatar-uploader"
-          :http-request="uploadAvatar"
+          name="file"
+          action="/api/user/avatar"
           :show-file-list="false"
           :on-success="handleAvatarSuccess"
           :before-upload="beforeAvatarUpload"
         >
-          <img v-if="userInfo.image_url" :src="image_url" class="avatar" />
+          <img v-if="userInfo.avatar" :src="userInfo.avatar" class="avatar" />
           <el-icon v-else class="avatar-uploader-icon"><Plus /></el-icon>
         </el-upload>
         <div class="warn">

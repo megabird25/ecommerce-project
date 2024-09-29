@@ -16,7 +16,7 @@ const getAddress = async () => {
   const res = await getUserAddressAPI();
   userAddress.value = res.result;
 
-  curAddress.value = userAddress.value?.find((item) => item.isDefault === 0);
+  curAddress.value = userAddress.value?.find((item) => item.is_default === 0);
 };
 
 onMounted(() => {
@@ -57,6 +57,8 @@ const createOrder = async () => {
 
     const res = await sendOrderAPI(order);
     if (res.code === 0) {
+      cartStore.removeSelected();
+      ElMessage.success("訂單已建立");
       router.push("/member/order");
     } else {
       ElMessage.error(res.message);
@@ -85,7 +87,7 @@ const createOrder = async () => {
               </tr>
             </thead>
             <tbody>
-              <tr v-for="i in cartStore.cartList" :key="i.id">
+              <tr v-for="i in cartStore.selectedItem" :key="i.id">
                 <td>
                   <a href="javascript:;" class="info">
                     <img :src="i.image_url" alt="" />
@@ -125,7 +127,10 @@ const createOrder = async () => {
               <el-button size="large" @click="showDialog = true"
                 >切換地址</el-button
               >
-              <el-button size="large" @click="addFlag = true"
+              <el-button
+                size="large"
+                @click="$router.push('/member/user/address')"
+                type="primary"
                 >添加地址</el-button
               >
             </div>
@@ -192,9 +197,7 @@ const createOrder = async () => {
           :class="{ active: activeAddress.id === item.id }"
         >
           <ul>
-            <li>
-              <span>收<i></i>貨<i></i>人：</span>{{ item.receiver }}
-            </li>
+            <li><span>收貨人：</span>{{ item.receiver }}</li>
             <li><span>聯絡方式：</span>{{ item.contact }}</li>
             <li><span>收貨地址：</span>{{ item.address }}</li>
           </ul>
@@ -208,7 +211,6 @@ const createOrder = async () => {
       </span>
     </template>
   </el-dialog>
-  <!-- 添加地址 -->
 </template>
 
 <style scoped lang="scss">

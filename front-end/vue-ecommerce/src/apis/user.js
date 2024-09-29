@@ -43,7 +43,7 @@ export const updateInfoAPI = (data) => {
   });
 };
 
-export const resetPassword = (data) => {
+export const resetPasswordAPI = (data) => {
   return httpInstance({
     url: "user/password",
     method: "PATCH",

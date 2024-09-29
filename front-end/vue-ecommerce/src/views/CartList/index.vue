@@ -1,10 +1,21 @@
 <script setup>
 import { useCartStore } from "@/stores/cartStore.js";
+import { ElMessage } from "element-plus";
+import { useRouter } from "vue-router";
 
 const cartStore = useCartStore();
+const router = useRouter();
 
 const allCheck = (selected) => {
   cartStore.allCheck(selected);
+};
+
+const goCheckout = () => {
+  if (cartStore.selectedItem.length === 0) {
+    ElMessage.error("請選擇需要購買的商品");
+  } else {
+    router.push("/checkout");
+  }
 };
 </script>
 
@@ -85,11 +96,7 @@ const allCheck = (selected) => {
           <span class="red">${{ cartStore.selectedPrice }}</span>
         </div>
         <div class="total">
-          <el-button
-            size="large"
-            type="primary"
-            @click="$router.push('/checkout')"
-          >
+          <el-button size="large" type="primary" @click="goCheckout">
             下單結算
           </el-button>
         </div>

@@ -15,10 +15,11 @@ export const createAddressAPI = (data) => {
   });
 };
 
-export const updateAddressAPI = (id) => {
+export const updateAddressAPI = (id, data) => {
   return httpInstance({
     url: `/user/address/${id}`,
     method: "PUT",
+    data
   });
 };
 

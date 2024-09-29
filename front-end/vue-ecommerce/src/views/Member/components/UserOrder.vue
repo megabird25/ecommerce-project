@@ -13,15 +13,15 @@ const tabTypes = [
 
 const orderList = ref([]);
 const total = ref(0);
+const currentPage = ref(1);
 const params = ref({
   status: 0,
   page: 1,
-  pageSize: 2,
+  pageSize: 5,
 });
 const getOrderList = async () => {
   const res = await getUserOrderAPI(params.value);
   orderList.value = res.result.data;
-  console.log(orderList.value);
   total.value = res.result.total;
 };
 
@@ -31,6 +31,13 @@ onMounted(() => {
 
 const tabChange = (type) => {
   params.value.status = type;
+  params.value.page = 1
+  currentPage.value = 1
+  getOrderList();
+};
+
+const pageChange = (page) => {
+  params.value.page = page;
   getOrderList();
 };
 
@@ -126,8 +133,9 @@ const tabChange = (type) => {
           <div class="pagination-container">
             <el-pagination
               :total="total"
-              @current-change="pageChange"
               :page-size="params.pageSize"
+              v-model:current-page="currentPage"
+              @current-change="pageChange"
               background
               layout="prev, pager, next"
             />
