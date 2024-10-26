@@ -58,7 +58,12 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
-        <!-- bcrypt加密 -->
+		<dependency>
+			<groupId>org.springdoc</groupId>
+			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+			<version>2.6.0</version>
+		</dependency>
+		<!-- bcrypt加密 -->
 		<dependency>
 			<groupId>org.mindrot</groupId>
 			<artifactId>jbcrypt</artifactId>

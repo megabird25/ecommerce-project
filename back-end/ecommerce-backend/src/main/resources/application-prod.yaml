@@ -1,0 +1,8 @@
+spring:
+  datasource:
+    url: jdbc:mysql://${MYSQL_HOST:db.home}:3306/ecommerce
+    username: ${MYSQL_USER:user}
+    password: ${MYSQL_PASSWORD:secret}
+  data:
+    redis:
+      host: ${REDIS_HOST:cache.home}

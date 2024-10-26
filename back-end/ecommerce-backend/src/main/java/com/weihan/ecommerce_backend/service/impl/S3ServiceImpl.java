@@ -2,8 +2,6 @@ package com.weihan.ecommerce_backend.service.impl;
 
 import com.weihan.ecommerce_backend.service.S3Service;
 import org.springframework.stereotype.Service;
-import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
-import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.*;
@@ -15,9 +13,7 @@ import java.util.List;
 @Service
 public class S3ServiceImpl implements S3Service {
 
-    private static final String ACCESS_KEY_ID = "";
-    private static final String SECRET_ACCESS_KEY = "";
-    private static final String BUCKET_NAME = "";
+    private static final String BUCKET_NAME = "weihan-ecommerce";
 
     public String uploadUserAvatar(File file, String fileName) {
         // 連接 S3 客戶端
@@ -72,12 +68,9 @@ public class S3ServiceImpl implements S3Service {
     }
 
     private static S3Client getS3Client() {
-        AwsBasicCredentials awsCreds = AwsBasicCredentials.create(ACCESS_KEY_ID, SECRET_ACCESS_KEY);
-
         // S3 客戶端，使用憑證，並返回
         return S3Client.builder()
                 .region(Region.AP_NORTHEAST_1)  // 區域
-                .credentialsProvider(StaticCredentialsProvider.create(awsCreds))
                 .build();
     }
 }

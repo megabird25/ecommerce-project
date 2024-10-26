@@ -1,15 +1,10 @@
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://192.168.30.101:3306/ecommerce
-    username: root
-    password: 123456
-  data:
-    redis:
-      host: 192.168.30.101
   jackson:
     property-naming-strategy: SNAKE_CASE
-
+  profiles:
+    active: ${ACTIVE:dev}
 
 server:
   servlet:
