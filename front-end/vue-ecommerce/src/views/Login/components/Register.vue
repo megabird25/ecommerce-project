@@ -4,7 +4,6 @@ import { ElMessage } from "element-plus";
 import "element-plus/theme-chalk/el-message.css";
 import { useRouter } from "vue-router";
 import { useUserStore } from "@/stores/userStore.js";
-import { registerAPI } from "@/apis/user.js";
 
 const emit = defineEmits(["currentComponent"]);
 const toggleComponent = () => {
@@ -56,10 +55,9 @@ const router = useRouter();
 const doLogin = () => {
   formRef.value.validate(async (valid) => {
     if (valid) {
-      const res = await registerAPI(form.value);
+      const res = await userStore.registerUser(form.value);
       if (res.code === 0) {
         ElMessage({ type: "success", message: res.message });
-        userStore.getUserInfo(form.value);
         router.replace({ path: "/" });
       } else {
         ElMessage({ type: "error", message: res.message });

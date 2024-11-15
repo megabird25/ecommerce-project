@@ -117,10 +117,7 @@ const createOrder = async () => {
                   <span>收<i></i>貨<i></i>人：</span>{{ curAddress.receiver }}
                 </li>
                 <li><span>聯絡方式：</span>{{ curAddress.contact }}</li>
-                <li>
-                  <span>收貨地址：</span>
-                  {{ curAddress.address }}
-                </li>
+                <li><span>收貨地址：</span>{{ curAddress.address }}</li>
               </ul>
             </div>
             <div class="action">
@@ -141,15 +138,15 @@ const createOrder = async () => {
         <div class="box-body">
           <a
             class="my-btn"
-            :class="{ active: payWay === 0 }"
-            @click="payWay = 0"
+            :class="{ active: payWay === '0' }"
+            @click="payWay = '0'"
             href="javascript:;"
             >線上付款</a
           >
           <a
             class="my-btn"
-            :class="{ active: payWay === 1 }"
-            @click="payWay = 1"
+            :class="{ active: payWay === '1' }"
+            @click="payWay = '1'"
             href="javascript:;"
             >貨到付款</a
           >

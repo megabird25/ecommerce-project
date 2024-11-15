@@ -40,9 +40,9 @@ const confirm = async () => {
           <li>
             <a href="javascript:;" @click="$router.push('/login')">登入</a>
           </li>
-          <li><a href="javascript:;">幫助中心</a></li>
-          <li><a href="javascript:;">關於我們</a></li>
         </template>
+        <li><a href="javascript:;">幫助中心</a></li>
+        <li><a href="javascript:;">關於我們</a></li>
       </ul>
     </div>
   </nav>

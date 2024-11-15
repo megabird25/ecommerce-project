@@ -57,8 +57,7 @@
           color: $xtxColor;
         }
 
-        &.active,
-        &.router-link-exact-active {
+        &.router-link-active {
           color: $xtxColor;
 
           &:before {

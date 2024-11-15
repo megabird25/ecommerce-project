@@ -37,15 +37,25 @@ public class UserController {
     }
 
     @PostMapping("/register")
-    public Result<User> register(@RequestBody Account account) {
+    public Result<User> register(@RequestBody Account account, HttpServletResponse response) {
         Optional<User> userOpt = userService.findByUsername(account.getUsername());
 
         if (userOpt.isEmpty()) {
+            // 建立新用戶儲存至數據庫
             User newUser = new User();
             String hashedPassword = BCrypt.hashpw(account.getPassword(), BCrypt.gensalt());
             newUser.setUsername(account.getUsername());
             newUser.setPassword(hashedPassword);
             userService.save(newUser);
+
+            String token = tokenGenerator(newUser);
+
+            // 生成並配置 cookie
+            Cookie cookie = new Cookie("jwt_token", token);
+            cookie.setPath("/");
+            cookie.setHttpOnly(true);
+            cookie.setMaxAge(24 * 60 * 60);
+            response.addCookie(cookie);
 
             return Result.success("註冊成功", newUser);
         }
@@ -61,15 +71,7 @@ public class UserController {
             User user = userOpt.get();
 
             if (BCrypt.checkpw(account.getPassword(), user.getPassword())) {
-                // 生成 token
-                Map<String, Object> claims = new HashMap<>();
-                claims.put("id", user.getId());
-                claims.put("username", user.getUsername());
-                String token = JwtUtil.genToken(claims);
-
-                // 把 token 儲存到 redis 中
-                ValueOperations<String, String> operations = stringRedisTemplate.opsForValue();
-                operations.set(user.getId().toString(), token, 24, TimeUnit.HOURS);
+                String token = tokenGenerator(user);
 
                 // 生成並配置 cookie
                 Cookie cookie = new Cookie("jwt_token", token);
@@ -180,5 +182,19 @@ public class UserController {
         }
 
         return Result.error("找不到該用戶");
+    }
+
+    private String tokenGenerator(User user) {
+        // 生成 token
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("id", user.getId());
+        claims.put("username", user.getUsername());
+        String token = JwtUtil.genToken(claims);
+
+        // 把 token 儲存到 redis 中
+        ValueOperations<String, String> operations = stringRedisTemplate.opsForValue();
+        operations.set(user.getId().toString(), token, 24, TimeUnit.HOURS);
+
+        return token;
     }
 }

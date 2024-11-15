@@ -1,7 +1,7 @@
 import { defineStore } from "pinia";
 import { ref } from "vue";
 import { useCartStore } from "./cartStore.js";
-import { loginAPI, logoutAPI } from "@/apis/user.js";
+import { loginAPI, logoutAPI, registerAPI } from "@/apis/user.js";
 
 export const useUserStore = defineStore(
   "user",
@@ -9,6 +9,12 @@ export const useUserStore = defineStore(
     const cartStore = useCartStore();
 
     const userInfo = ref({});
+
+    const registerUser = async (data) => {
+      const res = await registerAPI(data);
+      userInfo.value = res.result;
+      return res;
+    };
 
     const getUserInfo = async (data) => {
       const res = await loginAPI(data);
@@ -34,6 +40,7 @@ export const useUserStore = defineStore(
 
     return {
       userInfo,
+      registerUser,
       getUserInfo,
       clearUserInfo,
       logoutUser,

@@ -6,11 +6,11 @@ import httpInstance from "@/utils/http.js";
  *   password: 123456,
  * }
  */
-export const registerAPI = (data) => {
+export const registerAPI = ({username, password}) => {
   return httpInstance({
     url: "/user/register",
     method: "POST",
-    data,
+    data: {username, password},
   });
 };
 
